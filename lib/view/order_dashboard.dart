@@ -345,7 +345,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       flex: (flex * 10).toInt(),
       child: Container(
         padding: EdgeInsets.symmetric(
-          vertical: _getResponsivePadding(context, 07),
+          vertical: _getResponsivePadding(context, 8),
           horizontal: _getResponsivePadding(context, 5),
         ),
         margin: EdgeInsets.symmetric(vertical: 1),
@@ -359,7 +359,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
             letterSpacing: 0.3,
           ),
           textAlign: TextAlign.center,
-          maxLines: 1,
+          maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
       ),
