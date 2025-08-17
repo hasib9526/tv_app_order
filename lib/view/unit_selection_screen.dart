@@ -1,13 +1,13 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-
 import '../models/unit_model.dart';
 import 'order_dashboard.dart';
 
 class UnitSelectionScreen extends StatefulWidget {
+  const UnitSelectionScreen({super.key});
+
   @override
   _UnitSelectionScreenState createState() => _UnitSelectionScreenState();
 }
@@ -43,14 +43,21 @@ class _UnitSelectionScreenState extends State<UnitSelectionScreen> {
     });
 
     try {
-      final response = await http.get(
-        Uri.parse('http://apps.bitopibd.com:8090/bimobapiv2/api/FinishingBarcode/GetUnitData'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      ).timeout(Duration(seconds: 30), onTimeout: () {
-        throw Exception('Server is not responding. Please check your internet connection or try again later.');
-      });
+      final response = await http
+          .get(
+            Uri.parse(
+              'http://apps.bitopibd.com:8090/bimobapiv2/api/FinishingBarcode/GetUnitData',
+            ),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(
+            Duration(seconds: 30),
+            onTimeout: () {
+              throw Exception(
+                'Server is not responding. Please check your internet connection or try again later.',
+              );
+            },
+          );
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = json.decode(response.body);
@@ -105,26 +112,17 @@ class _UnitSelectionScreenState extends State<UnitSelectionScreen> {
                   ),
                   SizedBox(height: 20),
 
-                  // Unit GridView
                   Focus(
                     focusNode: _gridFocusNode,
-                    child: Container(
-                      height: 300,
-                      child: _buildUnitGrid(),
-                    ),
+                    child: Container(height: 300, child: _buildUnitGrid()),
                   ),
 
                   SizedBox(height: 20),
 
-                  // Instructions
                   Text(
                     'Use arrow keys to navigate, Enter to select',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(color: Colors.white70, fontSize: 16),
                   ),
-
                 ],
               ),
             ),
@@ -171,7 +169,6 @@ class _UnitSelectionScreenState extends State<UnitSelectionScreen> {
               setState(() {
                 selectedUnit = unit;
               });
-              // Auto-navigate when focused (for remote control)
               Future.delayed(Duration(milliseconds: 300), () {
                 if (selectedUnit?.unitID == unit.unitID) {
                   _navigateToDashboard(unit);
@@ -200,10 +197,7 @@ class _UnitSelectionScreenState extends State<UnitSelectionScreen> {
                       ),
                       Text(
                         'ID: ${unit.unitID}',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                        ),
+                        style: TextStyle(color: Colors.white70, fontSize: 12),
                       ),
                     ],
                   ),
@@ -220,16 +214,16 @@ class _UnitSelectionScreenState extends State<UnitSelectionScreen> {
     if (event is RawKeyDownEvent) {
       switch (event.logicalKey) {
         case LogicalKeyboardKey.arrowDown:
-          _moveSelectionInGrid(3); // Move down (3 columns)
+          _moveSelectionInGrid(3);
           break;
         case LogicalKeyboardKey.arrowUp:
-          _moveSelectionInGrid(-3); // Move up (3 columns)
+          _moveSelectionInGrid(-3);
           break;
         case LogicalKeyboardKey.arrowLeft:
-          _moveSelectionInGrid(-1); // Move left
+          _moveSelectionInGrid(-1);
           break;
         case LogicalKeyboardKey.arrowRight:
-          _moveSelectionInGrid(1); // Move right
+          _moveSelectionInGrid(1);
           break;
         case LogicalKeyboardKey.enter:
         case LogicalKeyboardKey.select:
@@ -250,7 +244,6 @@ class _UnitSelectionScreenState extends State<UnitSelectionScreen> {
 
     var newIndex = currentIndex + offset;
 
-    // Boundary checks
     if (newIndex < 0) newIndex = 0;
     if (newIndex >= units.length) newIndex = units.length - 1;
 
@@ -259,12 +252,10 @@ class _UnitSelectionScreenState extends State<UnitSelectionScreen> {
         selectedUnit = units[newIndex];
       });
 
-      // Calculate scroll position
-      final row = (newIndex / 3).floor(); // Assuming 3 columns
-      final itemHeight = 100; // Approximate height of each item
+      final row = (newIndex / 3).floor();
+      final itemHeight = 100;
       final scrollPosition = row * itemHeight;
 
-      // Animate scroll
       _scrollController.animateTo(
         scrollPosition.toDouble(),
         duration: Duration(milliseconds: 300),
@@ -276,9 +267,7 @@ class _UnitSelectionScreenState extends State<UnitSelectionScreen> {
   void _navigateToDashboard(Unit unit) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => OrdersDashboard(unit: unit),
-      ),
+      MaterialPageRoute(builder: (context) => OrdersDashboard(unit: unit)),
     );
   }
 }

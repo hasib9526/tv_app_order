@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Added for LogicalKeyboardKey
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:tv_app_order/models/unit_model.dart';
@@ -23,29 +23,20 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
   @override
   void initState() {
     super.initState();
-    // Force cleanup previous controller if exists
     try {
       Get.delete<OrderController>(force: true);
-    } catch (e) {
-      // Controller might not exist, that's fine
-    }
+    } catch (e) {}
 
-    // Create new controller instance
     controller = Get.put(OrderController(unit: widget.unit), permanent: false);
-
-    // Request focus for keyboard events
     _focusNode.requestFocus();
   }
 
   @override
   void dispose() {
-    // Cleanup when disposing
     try {
       controller.dispose();
       Get.delete<OrderController>(force: true);
-    } catch (e) {
-      // Controller might already be disposed
-    }
+    } catch (e) {}
     _focusNode.dispose();
     super.dispose();
   }
@@ -62,23 +53,23 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
             LogicalKeySet(LogicalKeyboardKey.goBack): const ActivateIntent(),
           },
           actions: {
-            ActivateIntent: CallbackAction(onInvoke: (_) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => UnitSelectionScreen(),
-                ),
-              );
-              return null;
-            }),
+            ActivateIntent: CallbackAction(
+              onInvoke: (_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UnitSelectionScreen(),
+                  ),
+                );
+                return null;
+              },
+            ),
           },
           child: GestureDetector(
             onHorizontalDragEnd: (details) {
               if (details.primaryVelocity! < 0) {
                 controller.nextPage();
-              }
-              // ডানে সোয়াইপ → আগের পেজ
-              else if (details.primaryVelocity! > 0) {
+              } else if (details.primaryVelocity! > 0) {
                 controller.previousPage();
               }
             },
@@ -105,10 +96,9 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
     );
   }
 
-  // Rest of your existing code remains exactly the same...
   double _getResponsiveFontSize(BuildContext context, double baseSize) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final scaleFactor = screenWidth / 1920; // Base on 1920px width (typical TV)
+    final scaleFactor = screenWidth / 1920;
     return (baseSize * scaleFactor).clamp(baseSize * 0.8, baseSize * 2.0);
   }
 
@@ -123,7 +113,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
 
   Widget _buildHeader(BuildContext context) {
     return Obx(
-          () => Container(
+      () => Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(
           vertical: _getResponsivePadding(context, 10),
@@ -131,10 +121,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
         ),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFF00796B), // Dark teal
-              Color(0xFF4DB6AC), // Light teal
-            ],
+            colors: [Color(0xFF00796B), Color(0xFF4DB6AC)],
           ),
           boxShadow: [
             BoxShadow(
@@ -151,7 +138,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
             Text(
               'UNIT: ${widget.unit.unitName}',
               style: TextStyle(
-                fontSize: _getResponsiveFontSize(context, 22),
+                fontSize: _getResponsiveFontSize(context, 18),
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -159,7 +146,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
             Text(
               'CTPAT ',
               style: TextStyle(
-                fontSize: _getResponsiveFontSize(context, 22),
+                fontSize: _getResponsiveFontSize(context, 18),
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -167,7 +154,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
             Text(
               'Date: ${DateFormat('yyyy-MM-dd').format(DateTime.now())}',
               style: TextStyle(
-                fontSize: _getResponsiveFontSize(context, 22),
+                fontSize: _getResponsiveFontSize(context, 18),
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -175,7 +162,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
             Text(
               'LIVE: ${DateFormat('HH:mm:ss').format(controller.currentTime.value)}',
               style: TextStyle(
-                fontSize: _getResponsiveFontSize(context, 22),
+                fontSize: _getResponsiveFontSize(context, 18),
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
                 letterSpacing: 1.2,
@@ -200,7 +187,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               bottom: 0,
             ),
             child: Obx(
-                  () => ListView.builder(
+              () => ListView.builder(
                 physics: NeverScrollableScrollPhysics(),
                 itemCount: controller.currentPageItems.length,
                 itemBuilder: (context, index) {
@@ -255,7 +242,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       flex: (flex * 10).toInt(),
       child: Container(
         padding: EdgeInsets.symmetric(
-          vertical: _getResponsivePadding(context, 10),
+          vertical: _getResponsivePadding(context, 6),
           horizontal: _getResponsivePadding(context, 6),
         ),
         child: Text(
@@ -267,7 +254,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
             letterSpacing: 0.5,
           ),
           textAlign: TextAlign.center,
-          maxLines: 2,
+          maxLines: 3,
           overflow: TextOverflow.ellipsis,
         ),
       ),
@@ -276,7 +263,6 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
 
   Widget _buildOrderRow(BuildContext context, OrderModel order, int index) {
     final rowColor = index % 2 == 0 ? Colors.grey[850]! : Colors.grey[800]!;
-    // Use double.parse() for decimal numbers
     final balanceColor = double.parse(order.balanceQty) > 0
         ? Colors.red[900]!
         : Colors.green[900]!;
@@ -289,26 +275,9 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       child: Row(
         children: [
           _buildDataCell(context, order.buyer, 1.3, Colors.transparent),
-          _buildDataCell(
-            context,
-            order.style,
-            2,
-            Colors.transparent,
-          ),
-          _buildDataCell(
-            context,
-            // _truncateText(order.poNo, 20),
-            order.poNo,
-            1.5,
-            Colors.transparent,
-          ),
-          _buildDataCell(
-            context,
-            // _truncateText(order.color, 20),
-            order.color,
-            2,
-            Colors.transparent,
-          ),
+          _buildDataCell(context, order.style, 2, Colors.transparent),
+          _buildDataCell(context, order.poNo, 1.5, Colors.transparent),
+          _buildDataCell(context, order.color, 2, Colors.transparent),
           _buildDataCell(context, order.country, 1.1, Colors.transparent),
           _buildDataCell(
             context,
@@ -366,18 +335,18 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
   }
 
   Widget _buildDataCell(
-      BuildContext context,
-      String text,
-      double flex,
-      Color backgroundColor, {
-        Color textColor = Colors.white,
-      }) {
+    BuildContext context,
+    String text,
+    double flex,
+    Color backgroundColor, {
+    Color textColor = Colors.white,
+  }) {
     return Expanded(
       flex: (flex * 10).toInt(),
       child: Container(
         padding: EdgeInsets.symmetric(
-          vertical: _getResponsivePadding(context, 05),
-          horizontal: _getResponsivePadding(context, 6),
+          vertical: _getResponsivePadding(context, 07),
+          horizontal: _getResponsivePadding(context, 5),
         ),
         margin: EdgeInsets.symmetric(vertical: 1),
         decoration: BoxDecoration(color: backgroundColor),
@@ -390,7 +359,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
             letterSpacing: 0.3,
           ),
           textAlign: TextAlign.center,
-          maxLines: 2,
+          maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
       ),
@@ -399,7 +368,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
 
   Widget _buildFooter(BuildContext context) {
     return Obx(
-          () => SingleChildScrollView(
+      () => SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Container(
           padding: EdgeInsets.symmetric(
@@ -423,12 +392,12 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
                         : Colors.grey[600],
                     boxShadow: i == controller.currentPage.value
                         ? [
-                      BoxShadow(
-                        color: Colors.blue.withOpacity(0.5),
-                        blurRadius: 8,
-                        spreadRadius: 2,
-                      ),
-                    ]
+                            BoxShadow(
+                              color: Colors.blue.withOpacity(0.5),
+                              blurRadius: 8,
+                              spreadRadius: 2,
+                            ),
+                          ]
                         : null,
                   ),
                 ),
@@ -483,7 +452,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           ),
           SizedBox(height: _getResponsivePadding(context, 16)),
           Obx(
-                () => Container(
+            () => Container(
               padding: EdgeInsets.symmetric(
                 horizontal: _getResponsivePadding(context, 48),
               ),
@@ -522,10 +491,5 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
         ],
       ),
     );
-  }
-
-  String _truncateText(String text, int maxLength) {
-    if (text.length <= maxLength) return text;
-    return '${text.substring(0, maxLength)}...';
   }
 }
