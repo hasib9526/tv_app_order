@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:get/get_navigation/src/routes/transitions_type.dart';
 import 'dart:io';
-import 'order_dashboard.dart';
+
+import 'package:tv_app_order/view/unit_selection_screen.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -25,22 +29,24 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Orders Dashboard TV',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         fontFamily: 'Roboto',
       ),
-      home: OrdersDashboard(),
+      home: UnitSelectionScreen(),
       debugShowCheckedModeBanner: false,
-      // Add TV remote control shortcuts
-      shortcuts: {
-        const SingleActivator(LogicalKeyboardKey.arrowUp): const DirectionalFocusIntent(TraversalDirection.up),
-        const SingleActivator(LogicalKeyboardKey.arrowDown): const DirectionalFocusIntent(TraversalDirection.down),
-        const SingleActivator(LogicalKeyboardKey.arrowLeft): const DirectionalFocusIntent(TraversalDirection.left),
-        const SingleActivator(LogicalKeyboardKey.arrowRight): const DirectionalFocusIntent(TraversalDirection.right),
-        const SingleActivator(LogicalKeyboardKey.select): const ActivateIntent(),
-        const SingleActivator(LogicalKeyboardKey.enter): const ActivateIntent(),
+      // GetX configuration
+      enableLog: false, // Disable GetX logs for production
+      defaultTransition: Transition.fade,
+      transitionDuration: Duration(milliseconds: 300),
+      // Memory management
+      routingCallback: (routing) {
+        // Clean up controllers when routes change
+        if (routing?.previous != null && routing?.current != null) {
+          // Optional: Add route-specific cleanup logic here
+        }
       },
     );
   }

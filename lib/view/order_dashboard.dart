@@ -1,52 +1,111 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Added for LogicalKeyboardKey
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'controller/order_controller.dart';
-import 'models/order_model.dart';
+import 'package:tv_app_order/models/unit_model.dart';
+import 'package:tv_app_order/view/unit_selection_screen.dart';
+import '../controller/order_controller.dart';
+import '../models/order_model.dart';
 
-class OrdersDashboard extends StatelessWidget {
-  final OrderController controller = Get.put(OrderController());
+class OrdersDashboard extends StatefulWidget {
+  final Unit unit;
 
-  OrdersDashboard({super.key});
+  const OrdersDashboard({super.key, required this.unit});
+
+  @override
+  State<OrdersDashboard> createState() => _OrdersDashboardState();
+}
+
+class _OrdersDashboardState extends State<OrdersDashboard> {
+  late OrderController controller;
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    // Force cleanup previous controller if exists
+    try {
+      Get.delete<OrderController>(force: true);
+    } catch (e) {
+      // Controller might not exist, that's fine
+    }
+
+    // Create new controller instance
+    controller = Get.put(OrderController(unit: widget.unit), permanent: false);
+
+    // Request focus for keyboard events
+    _focusNode.requestFocus();
+  }
+
+  @override
+  void dispose() {
+    // Cleanup when disposing
+    try {
+      controller.dispose();
+      Get.delete<OrderController>(force: true);
+    } catch (e) {
+      // Controller might already be disposed
+    }
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[900],
       body: SafeArea(
-        child: GestureDetector(
-          onHorizontalDragEnd: (details) {
-            if (details.primaryVelocity! < 0) {
-              controller.nextPage();
-            }
-            // ডানে সোয়াইপ → আগের পেজ
-            else if (details.primaryVelocity! > 0) {
-              controller.previousPage();
-            }
+        child: FocusableActionDetector(
+          focusNode: _focusNode,
+          autofocus: true,
+          shortcuts: {
+            LogicalKeySet(LogicalKeyboardKey.goBack): const ActivateIntent(),
           },
-          child: Column(
-            children: [
-              _buildHeader(context),
-              Expanded(
-                child: Obx(() {
-                  if (controller.isLoading.value) {
-                    return _buildLoadingWidget(context);
-                  }
-                  if (controller.errorMessage.value.isNotEmpty) {
-                    return _buildErrorWidget(context);
-                  }
-                  return _buildPagedContent(context);
-                }),
-              ),
-              _buildFooter(context),
-            ],
+          actions: {
+            ActivateIntent: CallbackAction(onInvoke: (_) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UnitSelectionScreen(),
+                ),
+              );
+              return null;
+            }),
+          },
+          child: GestureDetector(
+            onHorizontalDragEnd: (details) {
+              if (details.primaryVelocity! < 0) {
+                controller.nextPage();
+              }
+              // ডানে সোয়াইপ → আগের পেজ
+              else if (details.primaryVelocity! > 0) {
+                controller.previousPage();
+              }
+            },
+            child: Column(
+              children: [
+                _buildHeader(context),
+                Expanded(
+                  child: Obx(() {
+                    if (controller.isLoading.value) {
+                      return _buildLoadingWidget(context);
+                    }
+                    if (controller.errorMessage.value.isNotEmpty) {
+                      return _buildErrorWidget(context);
+                    }
+                    return _buildPagedContent(context);
+                  }),
+                ),
+                _buildFooter(context),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // Get responsive sizes based on screen dimensions
+  // Rest of your existing code remains exactly the same...
   double _getResponsiveFontSize(BuildContext context, double baseSize) {
     final screenWidth = MediaQuery.of(context).size.width;
     final scaleFactor = screenWidth / 1920; // Base on 1920px width (typical TV)
@@ -64,7 +123,7 @@ class OrdersDashboard extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     return Obx(
-      () => Container(
+          () => Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(
           vertical: _getResponsivePadding(context, 10),
@@ -87,10 +146,10 @@ class OrdersDashboard extends StatelessWidget {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             Text(
-              'UNIT: ${controller.unitName.value}',
+              'UNIT: ${widget.unit.unitName}',
               style: TextStyle(
                 fontSize: _getResponsiveFontSize(context, 22),
                 fontWeight: FontWeight.bold,
@@ -106,7 +165,7 @@ class OrdersDashboard extends StatelessWidget {
               ),
             ),
             Text(
-            'Date: ${DateFormat('yyyy-MM-dd').format(DateTime.now())}',
+              'Date: ${DateFormat('yyyy-MM-dd').format(DateTime.now())}',
               style: TextStyle(
                 fontSize: _getResponsiveFontSize(context, 22),
                 fontWeight: FontWeight.bold,
@@ -141,7 +200,7 @@ class OrdersDashboard extends StatelessWidget {
               bottom: 0,
             ),
             child: Obx(
-              () => ListView.builder(
+                  () => ListView.builder(
                 physics: NeverScrollableScrollPhysics(),
                 itemCount: controller.currentPageItems.length,
                 itemBuilder: (context, index) {
@@ -176,7 +235,7 @@ class OrdersDashboard extends StatelessWidget {
           _buildHeaderCell(context, 'Buyer', 1.3),
           _buildHeaderCell(context, 'Style', 2),
           _buildHeaderCell(context, 'PO', 1.5),
-          _buildHeaderCell(context, 'Color', 1.5),
+          _buildHeaderCell(context, 'Color', 2),
           _buildHeaderCell(context, 'Destination', 1.1),
           _buildHeaderCell(context, 'OrderQty', 0.9),
           _buildHeaderCell(context, 'Today Scan Qty', 0.9),
@@ -203,7 +262,7 @@ class OrdersDashboard extends StatelessWidget {
           text,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: _getResponsiveFontSize(context, 14),
+            fontSize: _getResponsiveFontSize(context, 12),
             color: Colors.white,
             letterSpacing: 0.5,
           ),
@@ -217,10 +276,13 @@ class OrdersDashboard extends StatelessWidget {
 
   Widget _buildOrderRow(BuildContext context, OrderModel order, int index) {
     final rowColor = index % 2 == 0 ? Colors.grey[850]! : Colors.grey[800]!;
-    final balanceColor =
-        order.balance > 0 ? Colors.red[900]! : Colors.green[900]!;
-    final remainColor =
-        order.remainCtnToScan > 0 ? Colors.orange[900]! : Colors.green[900]!;
+    // Use double.parse() for decimal numbers
+    final balanceColor = double.parse(order.balanceQty) > 0
+        ? Colors.red[900]!
+        : Colors.green[900]!;
+    final remainColor = double.parse(order.ctnPerQty) > 0
+        ? Colors.orange[900]!
+        : Colors.green[900]!;
 
     return Container(
       color: rowColor,
@@ -229,23 +291,25 @@ class OrdersDashboard extends StatelessWidget {
           _buildDataCell(context, order.buyer, 1.3, Colors.transparent),
           _buildDataCell(
             context,
-            _truncateText(order.style, 20),
+            order.style,
             2,
             Colors.transparent,
           ),
           _buildDataCell(
             context,
-            _truncateText(order.po, 20),
+            // _truncateText(order.poNo, 20),
+            order.poNo,
             1.5,
             Colors.transparent,
           ),
           _buildDataCell(
             context,
-            _truncateText(order.color, 20),
-            1.5,
+            // _truncateText(order.color, 20),
+            order.color,
+            2,
             Colors.transparent,
           ),
-          _buildDataCell(context, order.destination, 1.1, Colors.transparent),
+          _buildDataCell(context, order.country, 1.1, Colors.transparent),
           _buildDataCell(
             context,
             order.orderQty.toString(),
@@ -254,48 +318,44 @@ class OrdersDashboard extends StatelessWidget {
           ),
           _buildDataCell(
             context,
-            order.todayScanQty.toString(),
+            order.todayPeaceFinish.toString(),
             0.9,
-            // Colors.blueGrey[900]!,
-            Colors.transparent
-          ),
-          _buildDataCell(
-            context,
-            order.totalScanQty.toString(),
-            0.9,
-            // Colors.blueGrey[900]!,
             Colors.transparent,
           ),
           _buildDataCell(
             context,
-            order.balance.toString(),
+            order.todayPeaceShip.toString(),
+            0.9,
+            Colors.transparent,
+          ),
+          _buildDataCell(
+            context,
+            order.balanceQty.toString(),
             0.8,
             balanceColor.withOpacity(0.7),
             textColor: Colors.white,
           ),
           _buildDataCell(
             context,
-            order.reqCtn.toString(),
+            order.ctnPerQty.toString(),
             0.9,
             Colors.transparent,
           ),
           _buildDataCell(
             context,
-            order.todayScanCtn.toString(),
+            order.todayCTNFinish.toString(),
             0.9,
-            // Colors.blueGrey[900]!,
-              Colors.transparent
+            Colors.transparent,
           ),
           _buildDataCell(
             context,
-            order.totalScanCtn.toString(),
+            order.totalCTNFinish.toString(),
             0.9,
-            // Colors.blueGrey[900]!,
-              Colors.transparent
+            Colors.transparent,
           ),
           _buildDataCell(
             context,
-            order.remainCtnToScan.toString(),
+            order.ctnPerQty.toString(),
             1.1,
             remainColor.withOpacity(0.7),
             textColor: Colors.white,
@@ -306,17 +366,17 @@ class OrdersDashboard extends StatelessWidget {
   }
 
   Widget _buildDataCell(
-    BuildContext context,
-    String text,
-    double flex,
-    Color backgroundColor, {
-    Color textColor = Colors.white,
-  }) {
+      BuildContext context,
+      String text,
+      double flex,
+      Color backgroundColor, {
+        Color textColor = Colors.white,
+      }) {
     return Expanded(
-      flex: (flex *10).toInt(),
+      flex: (flex * 10).toInt(),
       child: Container(
         padding: EdgeInsets.symmetric(
-          vertical: _getResponsivePadding(context, 10),
+          vertical: _getResponsivePadding(context, 05),
           horizontal: _getResponsivePadding(context, 6),
         ),
         margin: EdgeInsets.symmetric(vertical: 1),
@@ -324,7 +384,7 @@ class OrdersDashboard extends StatelessWidget {
         child: Text(
           text,
           style: TextStyle(
-            fontSize: _getResponsiveFontSize(context, 13),
+            fontSize: _getResponsiveFontSize(context, 11),
             color: textColor,
             fontWeight: FontWeight.w500,
             letterSpacing: 0.3,
@@ -339,11 +399,11 @@ class OrdersDashboard extends StatelessWidget {
 
   Widget _buildFooter(BuildContext context) {
     return Obx(
-      () => SingleChildScrollView(
+          () => SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Container(
           padding: EdgeInsets.symmetric(
-            vertical: _getResponsivePadding(context, 8),
+            vertical: _getResponsivePadding(context, 4),
           ),
           color: Colors.grey[900],
           child: Row(
@@ -358,20 +418,18 @@ class OrdersDashboard extends StatelessWidget {
                   height: _getResponsivePadding(context, 16),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color:
-                        i == controller.currentPage.value
-                            ? Colors.blue
-                            : Colors.grey[600],
-                    boxShadow:
-                        i == controller.currentPage.value
-                            ? [
-                              BoxShadow(
-                                color: Colors.blue.withOpacity(0.5),
-                                blurRadius: 8,
-                                spreadRadius: 2,
-                              ),
-                            ]
-                            : null,
+                    color: i == controller.currentPage.value
+                        ? Colors.blue
+                        : Colors.grey[600],
+                    boxShadow: i == controller.currentPage.value
+                        ? [
+                      BoxShadow(
+                        color: Colors.blue.withOpacity(0.5),
+                        blurRadius: 8,
+                        spreadRadius: 2,
+                      ),
+                    ]
+                        : null,
                   ),
                 ),
             ],
@@ -425,7 +483,7 @@ class OrdersDashboard extends StatelessWidget {
           ),
           SizedBox(height: _getResponsivePadding(context, 16)),
           Obx(
-            () => Container(
+                () => Container(
               padding: EdgeInsets.symmetric(
                 horizontal: _getResponsivePadding(context, 48),
               ),
@@ -442,14 +500,6 @@ class OrdersDashboard extends StatelessWidget {
           SizedBox(height: _getResponsivePadding(context, 32)),
           ElevatedButton(
             onPressed: () => controller.fetchOrders(),
-            child: Text(
-              'RETRY',
-              style: TextStyle(
-                fontSize: _getResponsiveFontSize(context, 20),
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.0,
-              ),
-            ),
             style: ElevatedButton.styleFrom(
               padding: EdgeInsets.symmetric(
                 horizontal: _getResponsivePadding(context, 48),
@@ -458,6 +508,14 @@ class OrdersDashboard extends StatelessWidget {
               backgroundColor: Colors.blue,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'RETRY',
+              style: TextStyle(
+                fontSize: _getResponsiveFontSize(context, 20),
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.0,
               ),
             ),
           ),

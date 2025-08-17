@@ -4,9 +4,13 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../models/order_model.dart';
+import '../models/unit_model.dart';
 
 class OrderController extends GetxController {
-  static const String apiUrl = 'https://192.168.14.97:7023/api/Orders';
+  final Unit unit;
+  OrderController({required this.unit});
+
+  String get apiUrl => 'http://apps.bitopibd.com:8090/bimobapiv2/api/FinishingBarcode/GetFinishingBarcodeData?unit=${unit.unitName}';
 
   var orders = <OrderModel>[].obs;
   var isLoading = true.obs;
@@ -15,8 +19,8 @@ class OrderController extends GetxController {
   var currentTime = DateTime.now().obs;
   var lastDataUpdate = DateTime.now().obs;
   var currentPage = 0.obs;
-  var itemsPerPage = 16.obs;
-  var unitName = 'PRODUCTION-1'.obs;
+  var itemsPerPage = 15.obs;
+  var unitName = ''.obs;
 
   Timer? _clockTimer;
   Timer? _dataTimer;
@@ -24,41 +28,62 @@ class OrderController extends GetxController {
 
   @override
   void onInit() {
-    fetchOrders(showLoader: true); // first time → loader
+    super.onInit();
+    orders.clear();
+    isLoading.value = true;
+    errorMessage.value = '';
+    currentPage.value = 0;
+    unitName.value = unit.unitName;
+
+    fetchOrders(showLoader: true);
     _setupPageTimer();
     _startRealTimeClock();
-
-    // Auto refresh every 30 seconds without loader
-    _dataTimer = Timer.periodic(Duration(seconds: 2), (timer) {
+    _dataTimer = Timer.periodic(Duration(seconds: 60), (timer) {
       fetchOrders(showLoader: false);
     });
-
-    super.onInit();
   }
-
 
   @override
   void onClose() {
+    // All timers cleanup
     _dataTimer?.cancel();
     _pageTimer?.cancel();
     _clockTimer?.cancel();
+
+    // Clear all data
+    orders.clear();
+
     super.onClose();
   }
 
+  // Manual cleanup method
+  void dispose() {
+    _dataTimer?.cancel();
+    _pageTimer?.cancel();
+    _clockTimer?.cancel();
+    orders.clear();
+    isLoading.value = false;
+    errorMessage.value = '';
+    currentPage.value = 0;
+  }
+
   void _startRealTimeClock() {
+    _clockTimer?.cancel(); // Cancel if exists
     _clockTimer = Timer.periodic(Duration(seconds: 1), (timer) {
       currentTime.value = DateTime.now();
     });
   }
 
   void _setupPageTimer() {
+    _pageTimer?.cancel(); // Cancel if exists
     _pageTimer = Timer.periodic(Duration(seconds: 15), (timer) {
       if (!isLoading.value && errorMessage.value.isEmpty && orders.isNotEmpty) {
         currentPage.value = (currentPage.value + 1) % totalPages;
       }
     });
   }
-// পেজ কন্ট্রোলের জন্য মেথড
+
+  // পেজ কন্ট্রোলের জন্য মেথড
   void nextPage() {
     if (currentPage.value < totalPages - 1) {
       currentPage.value++;
@@ -74,51 +99,52 @@ class OrderController extends GetxController {
       currentPage.value = totalPages - 1; // লাস্ট পেজে যাবে
     }
   }
-  // Calculate items per page based on TV screen width
-  void calculateItemsPerPage(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
 
-    int newItemsPerPage;
-
-    // TV screen size breakpoints
-    if (screenWidth >= 3840) {
-      // 4K TV (3840x2160)
-      newItemsPerPage = 20;
-    } else if (screenWidth >= 2560) {
-      // 2K/QHD TV (2560x1440)
-      newItemsPerPage = 16;
-    } else if (screenWidth >= 1920) {
-      // Full HD TV (1920x1080)
-      newItemsPerPage = 12;
-    } else if (screenWidth >= 1366) {
-      // HD TV (1366x768)
-      newItemsPerPage = 10;
-    } else if (screenWidth >= 1280) {
-      // Smaller HD (1280x720)
-      newItemsPerPage = 8;
-    } else {
-      // Small screens
-      newItemsPerPage = 6;
-    }
-
-    // Also consider screen height for better optimization
-    if (screenHeight <= 720) {
-      newItemsPerPage = (newItemsPerPage * 0.75).round();
-    } else if (screenHeight >= 2160) {
-      newItemsPerPage = (newItemsPerPage * 1.25).round();
-    }
-
-    // Ensure minimum of 4 items and maximum of 25 items
-    newItemsPerPage = newItemsPerPage.clamp(4, 25);
-
-    if (itemsPerPage.value != newItemsPerPage) {
-      itemsPerPage.value = newItemsPerPage;
-      currentPage.value = 0; // Reset to first page when items per page changes
-
-      print('TV Screen: ${screenWidth}x${screenHeight}, Items per page: $newItemsPerPage');
-    }
-  }
+  // // Calculate items per page based on TV screen width
+  // void calculateItemsPerPage(BuildContext context) {
+  //   final screenWidth = MediaQuery.of(context).size.width;
+  //   final screenHeight = MediaQuery.of(context).size.height;
+  //
+  //   int newItemsPerPage;
+  //
+  //   // TV screen size breakpoints
+  //   if (screenWidth >= 3840) {
+  //     // 4K TV (3840x2160)
+  //     newItemsPerPage = 20;
+  //   } else if (screenWidth >= 2560) {
+  //     // 2K/QHD TV (2560x1440)
+  //     newItemsPerPage = 16;
+  //   } else if (screenWidth >= 1920) {
+  //     // Full HD TV (1920x1080)
+  //     newItemsPerPage = 12;
+  //   } else if (screenWidth >= 1366) {
+  //     // HD TV (1366x768)
+  //     newItemsPerPage = 10;
+  //   } else if (screenWidth >= 1280) {
+  //     // Smaller HD (1280x720)
+  //     newItemsPerPage = 8;
+  //   } else {
+  //     // Small screens
+  //     newItemsPerPage = 6;
+  //   }
+  //
+  //   // Also consider screen height for better optimization
+  //   if (screenHeight <= 720) {
+  //     newItemsPerPage = (newItemsPerPage * 0.75).round();
+  //   } else if (screenHeight >= 2160) {
+  //     newItemsPerPage = (newItemsPerPage * 1.25).round();
+  //   }
+  //
+  //   // Ensure minimum of 4 items and maximum of 25 items
+  //   newItemsPerPage = newItemsPerPage.clamp(4, 25);
+  //
+  //   if (itemsPerPage.value != newItemsPerPage) {
+  //     itemsPerPage.value = newItemsPerPage;
+  //     currentPage.value = 0; // Reset to first page when items per page changes
+  //
+  //     print('TV Screen: ${screenWidth}x${screenHeight}, Items per page: $newItemsPerPage');
+  //   }
+  // }
 
   // Alternative method: Calculate based on card size
   void calculateItemsPerPageByCardSize(BuildContext context, {
@@ -193,40 +219,6 @@ class OrderController extends GetxController {
     }
   }
 
-  // Future<void> fetchOrders() async {
-  //   try {
-  //     isLoading.value = true;
-  //     errorMessage.value = '';
-  //
-  //     final response = await http.get(
-  //       Uri.parse(apiUrl),
-  //       headers: {'Content-Type': 'application/json'},
-  //     );
-  //
-  //     if (response.statusCode == 200) {
-  //       List<dynamic> jsonData = json.decode(response.body);
-  //
-  //       // Sort to show latest data first (using id as timestamp proxy)
-  //       orders.value = jsonData.map((item) => OrderModel.fromJson(item)).toList()
-  //         ..sort((a, b) => b.id.compareTo(a.id));
-  //
-  //       lastUpdated.value = DateTime.now();
-  //       lastDataUpdate.value = DateTime.now();
-  //       currentPage.value = 0;
-  //
-  //       _dataTimer?.cancel();
-  //       _dataTimer = Timer.periodic(Duration(seconds: 30), (timer) {
-  //         fetchOrders();
-  //       });
-  //     } else {
-  //       errorMessage.value = 'Failed to load data: ${response.statusCode}';
-  //     }
-  //   } catch (e) {
-  //     errorMessage.value = 'Error: $e';
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
-  // }
   Future<void> fetchOrders({bool showLoader = true}) async {
     try {
       if (showLoader) {
@@ -237,7 +229,7 @@ class OrderController extends GetxController {
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: {'Content-Type': 'application/json'},
-      );
+      ).timeout(Duration(seconds: 10)); // Add timeout
 
       if (response.statusCode == 200) {
         List<dynamic> jsonData = json.decode(response.body);
@@ -249,7 +241,7 @@ class OrderController extends GetxController {
         orders.value = jsonData
             .map((item) => OrderModel.fromJson(item))
             .toList()
-          ..sort((a, b) => b.id.compareTo(a.id));
+          ..sort((a, b) => b.orderID.compareTo(a.orderID));
 
         lastUpdated.value = DateTime.now();
         lastDataUpdate.value = DateTime.now();
@@ -266,6 +258,7 @@ class OrderController extends GetxController {
       }
     } catch (e) {
       errorMessage.value = 'Error: $e';
+      print('Fetch Orders Error: $e'); // Debug log
     } finally {
       if (showLoader) {
         isLoading.value = false;
@@ -274,6 +267,7 @@ class OrderController extends GetxController {
   }
 
   List<OrderModel> get currentPageItems {
+    if (orders.isEmpty) return [];
     final startIndex = currentPage.value * itemsPerPage.value;
     final endIndex = (startIndex + itemsPerPage.value).clamp(0, orders.length);
     return orders.sublist(startIndex, endIndex);
@@ -308,101 +302,3 @@ class OrderController extends GetxController {
     currentPage.value = 0;
   }
 }
-
-
-// import 'dart:async';
-// import 'package:get/get.dart';
-// import 'package:http/http.dart' as http;
-// import 'dart:convert';
-// import '../models/order_model.dart';
-//
-// class OrderController extends GetxController {
-//   static const String apiUrl = 'https://192.168.14.107:7023/api/Orders';
-//
-//   var orders = <OrderModel>[].obs;
-//   var isLoading = true.obs;
-//   var errorMessage = ''.obs;
-//   var lastUpdated = DateTime.now().obs;
-//   var currentTime = DateTime.now().obs;
-//   var lastDataUpdate = DateTime.now().obs;
-//   var currentPage = 0.obs;
-//  var itemsPerPage = 11.obs;
-//   var unitName = 'PRODUCTION-1'.obs;
-//
-//   Timer? _clockTimer;
-//   Timer? _dataTimer;
-//   Timer? _pageTimer;
-//
-//   @override
-//   void onInit() {
-//     fetchOrders();
-//     _setupPageTimer();
-//     _startRealTimeClock();
-//     super.onInit();
-//   }
-//
-//   @override
-//   void onClose() {
-//     _dataTimer?.cancel();
-//     _pageTimer?.cancel();
-//     _clockTimer?.cancel();
-//     super.onClose();
-//   }
-//
-//   void _startRealTimeClock() {
-//     _clockTimer = Timer.periodic(Duration(seconds: 1), (timer) {
-//       currentTime.value = DateTime.now();
-//     });
-//   }
-//
-//   void _setupPageTimer() {
-//     _pageTimer = Timer.periodic(Duration(seconds: 10), (timer) {
-//       if (!isLoading.value && errorMessage.value.isEmpty && orders.isNotEmpty) {
-//         currentPage.value = (currentPage.value + 1) % totalPages;
-//       }
-//     });
-//   }
-//
-//   Future<void> fetchOrders() async {
-//     try {
-//       isLoading.value = true;
-//       errorMessage.value = '';
-//
-//       final response = await http.get(
-//         Uri.parse(apiUrl),
-//         headers: {'Content-Type': 'application/json'},
-//       );
-//
-//       if (response.statusCode == 200) {
-//         List<dynamic> jsonData = json.decode(response.body);
-//
-//         // Sort to show latest data first (using id as timestamp proxy)
-//         orders.value = jsonData.map((item) => OrderModel.fromJson(item)).toList()
-//           ..sort((a, b) => b.id.compareTo(a.id));
-//
-//         lastUpdated.value = DateTime.now();
-//         lastDataUpdate.value = DateTime.now();
-//         currentPage.value = 0;
-//
-//         _dataTimer?.cancel();
-//         _dataTimer = Timer.periodic(Duration(seconds: 30), (timer) {
-//           fetchOrders();
-//         });
-//       } else {
-//         errorMessage.value = 'Failed to load data: ${response.statusCode}';
-//       }
-//     } catch (e) {
-//       errorMessage.value = 'Error: $e';
-//     } finally {
-//       isLoading.value = false;
-//     }
-//   }
-//
-//   List<OrderModel> get currentPageItems {
-//     final startIndex = currentPage.value * itemsPerPage.value;
-//     final endIndex = (startIndex + itemsPerPage.value).clamp(0, orders.length);
-//     return orders.sublist(startIndex, endIndex);
-//   }
-//
-//   int get totalPages => (orders.length / itemsPerPage.value).ceil();
-// }
