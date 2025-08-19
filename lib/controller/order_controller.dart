@@ -18,7 +18,7 @@ class OrderController extends GetxController {
   var currentTime = DateTime.now().obs;
   var lastDataUpdate = DateTime.now().obs;
   var currentPage = 0.obs;
-  var itemsPerPage = 20.obs;
+  var itemsPerPage = 0.obs; // This will be dynamically calculated
   var unitName = ''.obs;
 
   Timer? _clockTimer;
@@ -37,7 +37,7 @@ class OrderController extends GetxController {
     fetchOrders(showLoader: true);
     _setupPageTimer();
     _startRealTimeClock();
-    _dataTimer = Timer.periodic(Duration(seconds: 2), (timer) {
+    _dataTimer = Timer.periodic(Duration(minutes:10), (timer) {
       fetchOrders(showLoader: false);
     });
   }
@@ -80,6 +80,19 @@ class OrderController extends GetxController {
     });
   }
 
+  // New method to update items per page based on screen size
+  void updateItemsPerPage(int newItemsPerPage) {
+    if (newItemsPerPage > 0 && newItemsPerPage != itemsPerPage.value) {
+      final oldPage = currentPage.value;
+      itemsPerPage.value = newItemsPerPage;
+
+      // Adjust current page if needed
+      if (oldPage >= totalPages) {
+        currentPage.value = totalPages > 0 ? totalPages - 1 : 0;
+      }
+    }
+  }
+
   void nextPage() {
     if (currentPage.value < totalPages - 1) {
       currentPage.value++;
@@ -95,8 +108,6 @@ class OrderController extends GetxController {
       currentPage.value = totalPages - 1;
     }
   }
-
-
 
   Future<void> fetchOrders({bool showLoader = true}) async {
     try {
@@ -149,5 +160,4 @@ class OrderController extends GetxController {
   }
 
   int get totalPages => orders.isEmpty ? 0 : (orders.length / itemsPerPage.value).ceil();
-
 }

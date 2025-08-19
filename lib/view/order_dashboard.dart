@@ -41,8 +41,28 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
     super.dispose();
   }
 
+  // Calculate how many items can fit on screen
+  int _calculateItemsPerPage(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final headerHeight = _getResponsivePadding(context, 10) * 2 + _getResponsiveFontSize(context, 18) + 20; // Header height
+    final tableHeaderHeight = _getResponsivePadding(context, 6) * 2 + _getResponsiveFontSize(context, 12) + 20; // Table header height
+    final footerHeight = _getResponsivePadding(context, 4) * 2 + _getResponsivePadding(context, 16) + 20; // Footer height
+    final rowHeight = _getResponsivePadding(context, 8) * 2 + _getResponsiveFontSize(context, 11) + 4; // Single row height with margins
+
+    final availableHeight = screenHeight - headerHeight - tableHeaderHeight - footerHeight - 40; // 40px for safe area and margins
+    final itemsCanFit = (availableHeight / rowHeight).floor();
+
+    return itemsCanFit > 0 ? itemsCanFit : 1; // At least 1 item
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Calculate and update items per page based on screen size
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final calculatedItems = _calculateItemsPerPage(context);
+      controller.updateItemsPerPage(calculatedItems);
+    });
+
     return Scaffold(
       backgroundColor: Colors.grey[900],
       body: SafeArea(
@@ -113,7 +133,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
 
   Widget _buildHeader(BuildContext context) {
     return Obx(
-      () => Container(
+          () => Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(
           vertical: _getResponsivePadding(context, 10),
@@ -187,14 +207,15 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               bottom: 0,
             ),
             child: Obx(
-              () => ListView.builder(
-                physics: NeverScrollableScrollPhysics(),
+                  () => ListView.builder(
+                // physics: NeverScrollableScrollPhysics(),
                 itemCount: controller.currentPageItems.length,
                 itemBuilder: (context, index) {
                   return _buildOrderRow(
                     context,
                     controller.currentPageItems[index],
                     index,
+                    controller.currentPage.value * controller.itemsPerPage.value + index + 1,
                   );
                 },
               ),
@@ -219,14 +240,16 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       ),
       child: Row(
         children: [
+          _buildHeaderCell(context, 'SL', 0.5),
           _buildHeaderCell(context, 'Buyer', 1.3),
           _buildHeaderCell(context, 'Style', 2),
           _buildHeaderCell(context, 'PO', 1.5),
           _buildHeaderCell(context, 'Color', 2),
+          _buildHeaderCell(context, 'Shipping Date',0.9),
           _buildHeaderCell(context, 'Destination', 1.1),
           _buildHeaderCell(context, 'OrderQty', 0.9),
-          _buildHeaderCell(context, 'Today Scan Qty', 0.9),
-          _buildHeaderCell(context, 'Total Scan Qty', 0.9),
+          // _buildHeaderCell(context, 'Today Scan Qty', 0.9),
+          // _buildHeaderCell(context, 'Total Scan Qty', 0.9),
           _buildHeaderCell(context, 'Balance Qty', 0.8),
           _buildHeaderCell(context, 'REQ.CTN', 0.9),
           _buildHeaderCell(context, 'Today Scan CTN', 0.9),
@@ -261,7 +284,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
     );
   }
 
-  Widget _buildOrderRow(BuildContext context, OrderModel order, int index) {
+  Widget _buildOrderRow(BuildContext context, OrderModel order, int index, int serialNumber) {
     final rowColor = index % 2 == 0 ? Colors.grey[850]! : Colors.grey[800]!;
     final balanceColor = double.parse(order.balanceQty) > 0
         ? Colors.red[900]!
@@ -274,10 +297,12 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       color: rowColor,
       child: Row(
         children: [
+          _buildDataCell(context, serialNumber.toString(), 0.5, Colors.transparent), // Added index column data
           _buildDataCell(context, order.buyer, 1.3, Colors.transparent),
           _buildDataCell(context, order.style, 2, Colors.transparent),
           _buildDataCell(context, order.poNo, 1.5, Colors.transparent),
           _buildDataCell(context, order.color, 2, Colors.transparent),
+          _buildDataCell(context, order.deliveryDate, 0.9, Colors.transparent),
           _buildDataCell(context, order.country, 1.1, Colors.transparent),
           _buildDataCell(
             context,
@@ -285,18 +310,18 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
             0.9,
             Colors.transparent,
           ),
-          _buildDataCell(
-            context,
-            order.todayPeaceFinish.toString(),
-            0.9,
-            Colors.transparent,
-          ),
-          _buildDataCell(
-            context,
-            order.todayPeaceShip.toString(),
-            0.9,
-            Colors.transparent,
-          ),
+          // _buildDataCell(
+          //   context,
+          //   order.todayPeaceFinish.toString(),
+          //   0.9,
+          //   Colors.transparent,
+          // ),
+          // _buildDataCell(
+          //   context,
+          //   order.todayPeaceShip.toString(),
+          //   0.9,
+          //   Colors.transparent,
+          // ),
           _buildDataCell(
             context,
             order.balanceQty.toString(),
@@ -306,7 +331,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           ),
           _buildDataCell(
             context,
-            order.ctnPerQty.toString(),
+            order.ctnQty.toString(),
             0.9,
             Colors.transparent,
           ),
@@ -324,7 +349,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           ),
           _buildDataCell(
             context,
-            order.ctnPerQty.toString(),
+            order.balanceCTNQty.toString(),
             1.1,
             remainColor.withOpacity(0.7),
             textColor: Colors.white,
@@ -335,17 +360,17 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
   }
 
   Widget _buildDataCell(
-    BuildContext context,
-    String text,
-    double flex,
-    Color backgroundColor, {
-    Color textColor = Colors.white,
-  }) {
+      BuildContext context,
+      String text,
+      double flex,
+      Color backgroundColor, {
+        Color textColor = Colors.white,
+      }) {
     return Expanded(
       flex: (flex * 10).toInt(),
       child: Container(
         padding: EdgeInsets.symmetric(
-          vertical: _getResponsivePadding(context, 8),
+          vertical: _getResponsivePadding(context, 08),
           horizontal: _getResponsivePadding(context, 5),
         ),
         margin: EdgeInsets.symmetric(vertical: 1),
@@ -368,7 +393,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
 
   Widget _buildFooter(BuildContext context) {
     return Obx(
-      () => SingleChildScrollView(
+          () => SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Container(
           padding: EdgeInsets.symmetric(
@@ -392,12 +417,12 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
                         : Colors.grey[600],
                     boxShadow: i == controller.currentPage.value
                         ? [
-                            BoxShadow(
-                              color: Colors.blue.withOpacity(0.5),
-                              blurRadius: 8,
-                              spreadRadius: 2,
-                            ),
-                          ]
+                      BoxShadow(
+                        color: Colors.blue.withOpacity(0.5),
+                        blurRadius: 8,
+                        spreadRadius: 2,
+                      ),
+                    ]
                         : null,
                   ),
                 ),
@@ -452,7 +477,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           ),
           SizedBox(height: _getResponsivePadding(context, 16)),
           Obx(
-            () => Container(
+                () => Container(
               padding: EdgeInsets.symmetric(
                 horizontal: _getResponsivePadding(context, 48),
               ),
