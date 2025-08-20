@@ -18,7 +18,7 @@ class OrderController extends GetxController {
   var currentTime = DateTime.now().obs;
   var lastDataUpdate = DateTime.now().obs;
   var currentPage = 0.obs;
-  var itemsPerPage = 0.obs; // This will be dynamically calculated
+  var itemsPerPage = 16.obs; // This will be dynamically calculated
   var unitName = ''.obs;
 
   Timer? _clockTimer;

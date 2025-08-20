@@ -41,27 +41,10 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
     super.dispose();
   }
 
-  // Calculate how many items can fit on screen
-  int _calculateItemsPerPage(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final headerHeight = _getResponsivePadding(context, 10) * 2 + _getResponsiveFontSize(context, 18) + 20; // Header height
-    final tableHeaderHeight = _getResponsivePadding(context, 6) * 2 + _getResponsiveFontSize(context, 12) + 20; // Table header height
-    final footerHeight = _getResponsivePadding(context, 4) * 2 + _getResponsivePadding(context, 16) + 20; // Footer height
-    final rowHeight = _getResponsivePadding(context, 8) * 2 + _getResponsiveFontSize(context, 11) + 4; // Single row height with margins
-
-    final availableHeight = screenHeight - headerHeight - tableHeaderHeight - footerHeight - 40; // 40px for safe area and margins
-    final itemsCanFit = (availableHeight / rowHeight).floor();
-
-    return itemsCanFit > 0 ? itemsCanFit : 1; // At least 1 item
-  }
 
   @override
   Widget build(BuildContext context) {
-    // Calculate and update items per page based on screen size
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final calculatedItems = _calculateItemsPerPage(context);
-      controller.updateItemsPerPage(calculatedItems);
-    });
+
 
     return Scaffold(
       backgroundColor: Colors.grey[900],
@@ -240,9 +223,9 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       ),
       child: Row(
         children: [
-          _buildHeaderCell(context, 'SL', 0.5),
+          _buildHeaderCell(context, 'SL', 0.4),
           _buildHeaderCell(context, 'Buyer', 1.3),
-          _buildHeaderCell(context, 'Style', 2),
+          _buildHeaderCell(context, 'Style', 2.2),
           _buildHeaderCell(context, 'PO', 1.5),
           _buildHeaderCell(context, 'Color', 2),
           _buildHeaderCell(context, 'Shipping Date',0.9),
@@ -272,7 +255,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           text,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: _getResponsiveFontSize(context, 12),
+            fontSize: _getResponsiveFontSize(context, 13),
             color: Colors.white,
             letterSpacing: 0.5,
           ),
@@ -297,9 +280,9 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       color: rowColor,
       child: Row(
         children: [
-          _buildDataCell(context, serialNumber.toString(), 0.5, Colors.transparent), // Added index column data
+          _buildDataCell(context, serialNumber.toString(), 0.4, Colors.transparent), // Added index column data
           _buildDataCell(context, order.buyer, 1.3, Colors.transparent),
-          _buildDataCell(context, order.style, 2, Colors.transparent),
+          _buildDataCell(context, order.style, 2.2, Colors.transparent),
           _buildDataCell(context, order.poNo, 1.5, Colors.transparent),
           _buildDataCell(context, order.color, 2, Colors.transparent),
           _buildDataCell(context, order.deliveryDate, 0.9, Colors.transparent),
@@ -369,23 +352,26 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
     return Expanded(
       flex: (flex * 10).toInt(),
       child: Container(
+        height: MediaQuery.of(context).size.height * 0.05,
         padding: EdgeInsets.symmetric(
-          vertical: _getResponsivePadding(context, 08),
-          horizontal: _getResponsivePadding(context, 5),
+          vertical: _getResponsivePadding(context, 04),
+          horizontal: _getResponsivePadding(context, 2),
         ),
         margin: EdgeInsets.symmetric(vertical: 1),
         decoration: BoxDecoration(color: backgroundColor),
-        child: Text(
-          text,
-          style: TextStyle(
-            fontSize: _getResponsiveFontSize(context, 11),
-            color: textColor,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 0.3,
+        child: Center(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: _getResponsiveFontSize(context, 12),
+              color: textColor,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.3,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-          textAlign: TextAlign.center,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
         ),
       ),
     );
@@ -408,8 +394,8 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
                   margin: EdgeInsets.symmetric(
                     horizontal: _getResponsivePadding(context, 8),
                   ),
-                  width: _getResponsivePadding(context, 16),
-                  height: _getResponsivePadding(context, 16),
+                  width: _getResponsivePadding(context, 10),
+                  height: _getResponsivePadding(context, 10),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: i == controller.currentPage.value
