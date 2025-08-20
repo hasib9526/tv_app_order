@@ -37,6 +37,7 @@ dependencies:
   get:
   http:
   intl:
+  flutter_screenutil:
 
 dev_dependencies:
   flutter_test:

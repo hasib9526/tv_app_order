@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:tv_app_order/models/unit_model.dart';
@@ -255,7 +256,8 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           text,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: _getResponsiveFontSize(context, 13),
+            // fontSize: _getResponsiveFontSize(context, 13),
+            fontSize: 16.sp,
             color: Colors.white,
             letterSpacing: 0.5,
           ),
@@ -363,7 +365,8 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           child: Text(
             text,
             style: TextStyle(
-              fontSize: _getResponsiveFontSize(context, 12),
+              // fontSize: _getResponsiveFontSize(context, 12),
+              fontSize: 15.sp,
               color: textColor,
               fontWeight: FontWeight.w500,
               letterSpacing: 0.3,
