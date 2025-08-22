@@ -42,57 +42,63 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
-      backgroundColor: Colors.grey[900],
+      backgroundColor: Color(0xFF0A0E1A),
       body: SafeArea(
-        child: FocusableActionDetector(
-          focusNode: _focusNode,
-          autofocus: true,
-          shortcuts: {
-            LogicalKeySet(LogicalKeyboardKey.goBack): const ActivateIntent(),
-          },
-          actions: {
-            ActivateIntent: CallbackAction(
-              onInvoke: (_) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => UnitSelectionScreen(),
-                  ),
-                );
-                return null;
-              },
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              center: Alignment.topCenter,
+              radius: 1.5,
+              colors: [Color(0xFF1E3A8A).withOpacity(0.1), Color(0xFF0A0E1A)],
             ),
-          },
-          child: GestureDetector(
-            onHorizontalDragEnd: (details) {
-              if (details.primaryVelocity! < 0) {
-                controller.nextPage();
-              } else if (details.primaryVelocity! > 0) {
-                controller.previousPage();
-              }
+          ),
+          child: FocusableActionDetector(
+            focusNode: _focusNode,
+            autofocus: true,
+            shortcuts: {
+              LogicalKeySet(LogicalKeyboardKey.goBack): const ActivateIntent(),
             },
-            child: Column(
-              children: [
-                _buildHeader(context),
-                Expanded(
-                  child: Obx(() {
-                    if (controller.isLoading.value) {
-                      return _buildLoadingWidget(context);
-                    }
-                    if (controller.errorMessage.value.isNotEmpty) {
-                      return _buildErrorWidget(context);
-                    }
-                    return _buildPagedContent(context);
-                  }),
-                ),
-                _buildFooter(context),
-              ],
+            actions: {
+              ActivateIntent: CallbackAction(
+                onInvoke: (_) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UnitSelectionScreen(),
+                    ),
+                  );
+                  return null;
+                },
+              ),
+            },
+            child: GestureDetector(
+              onHorizontalDragEnd: (details) {
+                if (details.primaryVelocity! < 0) {
+                  controller.nextPage();
+                } else if (details.primaryVelocity! > 0) {
+                  controller.previousPage();
+                }
+              },
+              child: Column(
+                children: [
+                  _buildHeader(context),
+                  Expanded(
+                    child: Obx(() {
+                      if (controller.isLoading.value) {
+                        return _buildLoadingWidget(context);
+                      }
+                      if (controller.errorMessage.value.isNotEmpty) {
+                        return _buildErrorWidget(context);
+                      }
+                      return _buildPagedContent(context);
+                    }),
+                  ),
+                  _buildFooter(context),
+                ],
+              ),
             ),
           ),
         ),
@@ -100,59 +106,61 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
     );
   }
 
-  double _getResponsiveFontSize(BuildContext context, double baseSize) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final scaleFactor = screenWidth / 1920;
-    return (baseSize * scaleFactor).clamp(baseSize * 0.8, baseSize * 2.0);
-  }
-
-  double _getResponsivePadding(BuildContext context, double basePadding) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final scaleFactor = screenWidth / 1920;
-    return (basePadding * scaleFactor).clamp(
-      basePadding * 0.8,
-      basePadding * 2.0,
-    );
-  }
-
   Widget _buildHeader(BuildContext context) {
     return Obx(
-          () => Container(
+      () => Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(
-          vertical: _getResponsivePadding(context, 10),
+          vertical: _getResponsivePadding(context, 4),
           horizontal: _getResponsivePadding(context, 30),
         ),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF00796B), Color(0xFF4DB6AC)],
+            colors: [Color(0xFF1A237E), Color(0xFF283593)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              blurRadius: 15,
-              offset: Offset(0, 8),
+              color: Colors.black.withOpacity(0.7),
+              blurRadius: 20,
+              offset: Offset(0, 10),
+              spreadRadius: 2,
             ),
           ],
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.blueAccent.withOpacity(0.3),
+              width: 2,
+            ),
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
               'UNIT: ${widget.unit.unitName}',
               style: TextStyle(
-                fontSize: _getResponsiveFontSize(context, 18),
+                fontSize: _getResponsiveFontSize(context, 20),
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
+                shadows: [
+                  Shadow(
+                    color: Colors.black.withOpacity(0.5),
+                    blurRadius: 4,
+                    offset: Offset(1, 1),
+                  ),
+                ],
               ),
             ),
             Text(
-              'CTPAT ',
+              'CT PAT ',
               style: TextStyle(
                 fontSize: _getResponsiveFontSize(context, 18),
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
+                letterSpacing: 1.2,
               ),
             ),
             Text(
@@ -161,6 +169,13 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
                 fontSize: _getResponsiveFontSize(context, 18),
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
+                shadows: [
+                  Shadow(
+                    color: Colors.black.withOpacity(0.5),
+                    blurRadius: 4,
+                    offset: Offset(1, 1),
+                  ),
+                ],
               ),
             ),
             Text(
@@ -191,7 +206,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               bottom: 0,
             ),
             child: Obx(
-                  () => ListView.builder(
+              () => ListView.builder(
                 // physics: NeverScrollableScrollPhysics(),
                 itemCount: controller.currentPageItems.length,
                 itemBuilder: (context, index) {
@@ -199,7 +214,10 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
                     context,
                     controller.currentPageItems[index],
                     index,
-                    controller.currentPage.value * controller.itemsPerPage.value + index + 1,
+                    controller.currentPage.value *
+                            controller.itemsPerPage.value +
+                        index +
+                        1,
                   );
                 },
               ),
@@ -213,14 +231,24 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
   Widget _buildTableHeader(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(
-        top: _getResponsivePadding(context, 10),
+        top: _getResponsivePadding(context, 3),
         left: _getResponsivePadding(context, 10),
         right: _getResponsivePadding(context, 10),
         bottom: 0,
       ),
       decoration: BoxDecoration(
-        color: Colors.blueGrey[800],
-        borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+        gradient: LinearGradient(
+          colors: [Color(0xFF1F2937), Color(0xFF374151)],
+        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+        border: Border.all(color: Color(0xFF06B6D4).withOpacity(0.3), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0xFF06B6D4).withOpacity(0.1),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -229,7 +257,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           _buildHeaderCell(context, 'Style', 2.2),
           _buildHeaderCell(context, 'PO', 1.5),
           _buildHeaderCell(context, 'Color', 2),
-          _buildHeaderCell(context, 'Shipping Date',0.9),
+          _buildHeaderCell(context, 'Shipping Date', 0.9),
           _buildHeaderCell(context, 'Destination', 1.1),
           _buildHeaderCell(context, 'OrderQty', 0.9),
           // _buildHeaderCell(context, 'Today Scan Qty', 0.9),
@@ -256,10 +284,17 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           text,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            // fontSize: _getResponsiveFontSize(context, 13),
-            fontSize: 16.sp,
-            color: Colors.white,
+            fontSize: 17.sp,
+           // color: Color(0xFF06B6D4),
+             color:Colors.white,
             letterSpacing: 0.5,
+            shadows: [
+              Shadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 2,
+                offset: Offset(1, 1),
+              ),
+            ],
           ),
           textAlign: TextAlign.center,
           maxLines: 3,
@@ -269,25 +304,57 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
     );
   }
 
-  Widget _buildOrderRow(BuildContext context, OrderModel order, int index, int serialNumber) {
-    final rowColor = index % 2 == 0 ? Colors.grey[850]! : Colors.grey[800]!;
+  Widget _buildOrderRow(
+    BuildContext context,
+    OrderModel order,
+    int index,
+    int serialNumber,
+  ) {
+    final rowColor = index % 2 == 0
+        ? Color(0xFF1E293B).withOpacity(0.8)
+        : Color(0xFF334155).withOpacity(0.6);
+
     final balanceColor = double.parse(order.balanceQty) > 0
-        ? Colors.red[900]!
-        : Colors.green[900]!;
+        ? Color(0xFFEF4444)
+        : Color(0xFF10B981);
+
     final remainColor = double.parse(order.ctnPerQty) > 0
-        ? Colors.orange[900]!
-        : Colors.green[900]!;
+        ? Color(0xFFF59E0B)
+        : Color(0xFF10B981);
 
     return Container(
-      color: rowColor,
+      decoration: BoxDecoration(
+        color: rowColor,
+        border: Border(
+          bottom: BorderSide(
+            color: Color(0xFF06B6D4).withOpacity(0.1),
+            width: 0.5,
+          ),
+        ),
+      ),
       child: Row(
         children: [
-          _buildDataCell(context, serialNumber.toString(), 0.4, Colors.transparent), // Added index column data
+          _buildDataCell(
+            context,
+            serialNumber.toString(),
+            0.4,
+            Colors.transparent,
+          ),
           _buildDataCell(context, order.buyer, 1.3, Colors.transparent),
           _buildDataCell(context, order.style, 2.2, Colors.transparent),
           _buildDataCell(context, order.poNo, 1.5, Colors.transparent),
           _buildDataCell(context, order.color, 2, Colors.transparent),
-          _buildDataCell(context, order.deliveryDate, 0.9, Colors.transparent),
+          _buildDataCell(
+            context,
+            _formatShippingDate(order.deliveryDate),
+            0.9,
+            _getShippingDateBackgroundColor(order.deliveryDate),
+            textColor: _getShippingDateColor(order.deliveryDate),
+            hasBorder:
+                _getShippingDateBackgroundColor(order.deliveryDate) !=
+                Colors.transparent,
+            borderColor: _getShippingDateColor(order.deliveryDate),
+          ),
           _buildDataCell(context, order.country, 1.1, Colors.transparent),
           _buildDataCell(
             context,
@@ -311,8 +378,10 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
             context,
             order.balanceQty.toString(),
             0.8,
-            balanceColor.withOpacity(0.7),
-            textColor: Colors.white,
+            balanceColor.withOpacity(0.2),
+            textColor: balanceColor,
+            hasBorder: true,
+            borderColor: balanceColor,
           ),
           _buildDataCell(
             context,
@@ -336,8 +405,10 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
             context,
             order.balanceCTNQty.toString(),
             1.1,
-            remainColor.withOpacity(0.7),
-            textColor: Colors.white,
+            remainColor.withOpacity(0.2),
+            textColor: remainColor,
+            hasBorder: true,
+            borderColor: remainColor,
           ),
         ],
       ),
@@ -345,31 +416,45 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
   }
 
   Widget _buildDataCell(
-      BuildContext context,
-      String text,
-      double flex,
-      Color backgroundColor, {
-        Color textColor = Colors.white,
-      }) {
+    BuildContext context,
+    String text,
+    double flex,
+    Color backgroundColor, {
+    Color textColor = const Color(0xFFF1F5F9),
+    bool hasBorder = false,
+    Color? borderColor,
+  }) {
     return Expanded(
       flex: (flex * 10).toInt(),
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.05,
+        height: MediaQuery.of(context).size.height * 0.0499,
         padding: EdgeInsets.symmetric(
-          vertical: _getResponsivePadding(context, 02),
+          vertical: _getResponsivePadding(context, 01),
           horizontal: _getResponsivePadding(context, 2),
         ),
         margin: EdgeInsets.symmetric(vertical: 1),
-        decoration: BoxDecoration(color: backgroundColor),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: hasBorder ? BorderRadius.circular(4) : null,
+          border: hasBorder && borderColor != null
+              ? Border.all(color: borderColor.withOpacity(0.5), width: 1)
+              : null,
+        ),
         child: Center(
           child: Text(
             text,
             style: TextStyle(
-              // fontSize: _getResponsiveFontSize(context, 12),
               fontSize: 15.sp,
               color: textColor,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
               letterSpacing: 0.3,
+              shadows: [
+                Shadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 1,
+                  offset: Offset(0.5, 0.5),
+                ),
+              ],
             ),
             textAlign: TextAlign.center,
             maxLines: 2,
@@ -382,36 +467,53 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
 
   Widget _buildFooter(BuildContext context) {
     return Obx(
-          () => SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            vertical: _getResponsivePadding(context, 4),
+      () => Container(
+        padding: EdgeInsets.symmetric(
+          vertical: _getResponsivePadding(context, 3),
+        ),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFF0A0E1A),
+              Color(0xFF1E293B).withOpacity(0.5),
+              Color(0xFF0A0E1A),
+            ],
           ),
-          color: Colors.grey[900],
+        ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               for (int i = 0; i < controller.totalPages; i++)
                 Container(
                   margin: EdgeInsets.symmetric(
-                    horizontal: _getResponsivePadding(context, 8),
+                    horizontal: _getResponsivePadding(context, 6),
                   ),
-                  width: _getResponsivePadding(context, 10),
-                  height: _getResponsivePadding(context, 10),
+                  width: _getResponsivePadding(context, 12),
+                  height: _getResponsivePadding(context, 12),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: i == controller.currentPage.value
-                        ? Colors.blue
-                        : Colors.grey[600],
+                    gradient: i == controller.currentPage.value
+                        ? LinearGradient(
+                            colors: [Color(0xFF06B6D4), Color(0xFF8B5CF6)],
+                          )
+                        : null,
+                    color: i != controller.currentPage.value
+                        ? Color(0xFF374151)
+                        : null,
+                    border: Border.all(
+                      color: Color(0xFF06B6D4).withOpacity(0.3),
+                      width: 1,
+                    ),
                     boxShadow: i == controller.currentPage.value
                         ? [
-                      BoxShadow(
-                        color: Colors.blue.withOpacity(0.5),
-                        blurRadius: 8,
-                        spreadRadius: 2,
-                      ),
-                    ]
+                            BoxShadow(
+                              color: Color(0xFF06B6D4).withOpacity(0.4),
+                              blurRadius: 12,
+                              spreadRadius: 2,
+                            ),
+                          ]
                         : null,
                   ),
                 ),
@@ -427,17 +529,41 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
-            strokeWidth: 6,
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+          Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [Color(0xFF06B6D4), Color(0xFF8B5CF6)],
+              ),
+            ),
+            child: CircularProgressIndicator(
+              strokeWidth: 6,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              backgroundColor: Colors.transparent,
+            ),
           ),
           SizedBox(height: _getResponsivePadding(context, 32)),
-          Text(
-            'Loading Production Data...',
-            style: TextStyle(
-              fontSize: _getResponsiveFontSize(context, 28),
-              color: Colors.white70,
-              fontWeight: FontWeight.w500,
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(25),
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF06B6D4).withOpacity(0.1),
+                  Color(0xFF8B5CF6).withOpacity(0.1),
+                ],
+              ),
+              border: Border.all(color: Color(0xFF06B6D4).withOpacity(0.3)),
+            ),
+            child: Text(
+              'Loading Production Data...',
+              style: TextStyle(
+                fontSize: _getResponsiveFontSize(context, 28),
+                color: Color(0xFF06B6D4),
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1,
+              ),
             ),
           ),
         ],
@@ -450,10 +576,19 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.error_outline,
-            size: _getResponsiveFontSize(context, 80),
-            color: Colors.red,
+          Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [Color(0xFFEF4444), Color(0xFFF97316)],
+              ),
+            ),
+            child: Icon(
+              Icons.error_outline,
+              size: _getResponsiveFontSize(context, 60),
+              color: Colors.white,
+            ),
           ),
           SizedBox(height: _getResponsivePadding(context, 32)),
           Text(
@@ -461,20 +596,27 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
             style: TextStyle(
               fontSize: _getResponsiveFontSize(context, 32),
               fontWeight: FontWeight.bold,
-              color: Colors.red,
+              color: Color(0xFFEF4444),
             ),
           ),
           SizedBox(height: _getResponsivePadding(context, 16)),
           Obx(
-                () => Container(
+            () => Container(
               padding: EdgeInsets.symmetric(
                 horizontal: _getResponsivePadding(context, 48),
+                vertical: _getResponsivePadding(context, 16),
+              ),
+              margin: EdgeInsets.symmetric(horizontal: 40),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Color(0xFFEF4444).withOpacity(0.1),
+                border: Border.all(color: Color(0xFFEF4444).withOpacity(0.3)),
               ),
               child: Text(
                 controller.errorMessage.value,
                 style: TextStyle(
                   fontSize: _getResponsiveFontSize(context, 20),
-                  color: Colors.white70,
+                  color: Color(0xFFF1F5F9),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -483,27 +625,182 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           SizedBox(height: _getResponsivePadding(context, 32)),
           ElevatedButton(
             onPressed: () => controller.fetchOrders(),
-            style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.symmetric(
-                horizontal: _getResponsivePadding(context, 48),
-                vertical: _getResponsivePadding(context, 20),
+            style:
+                ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: _getResponsivePadding(context, 48),
+                    vertical: _getResponsivePadding(context, 20),
+                  ),
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                ).copyWith(
+                  backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                ),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF06B6D4), Color(0xFF8B5CF6)],
+                ),
+                borderRadius: BorderRadius.circular(25),
               ),
-              backgroundColor: Colors.blue,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: Text(
-              'RETRY',
-              style: TextStyle(
-                fontSize: _getResponsiveFontSize(context, 20),
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.0,
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              child: Text(
+                'RETRY',
+                style: TextStyle(
+                  fontSize: _getResponsiveFontSize(context, 20),
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.0,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  String _formatShippingDate(String dateString) {
+    try {
+      DateTime date = DateTime.parse(dateString);
+
+      return DateFormat('dd-MMM').format(date);
+    } catch (e) {
+      return dateString;
+    }
+  }
+
+  Color _getShippingDateColor(String dateString) {
+    try {
+      DateTime shippingDate = DateTime.parse(dateString);
+      DateTime currentDate = DateTime.now();
+
+      DateTime shippingDateOnly = DateTime(
+        shippingDate.year,
+        shippingDate.month,
+        shippingDate.day,
+      );
+      DateTime currentDateOnly = DateTime(
+        currentDate.year,
+        currentDate.month,
+        currentDate.day,
+      );
+
+      int daysDifference = shippingDateOnly.difference(currentDateOnly).inDays;
+
+      if (daysDifference <= 0) {
+        return Color(0xFFEF4444);
+      } else {
+        if (_isNearestUpcomingDate(dateString)) {
+          return Color(0xFFF97316);
+        } else {
+          return Color(0xFFF1F5F9);
+        }
+      }
+    } catch (e) {
+      return Color(0xFFF1F5F9);
+    }
+  }
+
+  Color _getShippingDateBackgroundColor(String dateString) {
+    try {
+      DateTime shippingDate = DateTime.parse(dateString);
+      DateTime currentDate = DateTime.now();
+
+      DateTime shippingDateOnly = DateTime(
+        shippingDate.year,
+        shippingDate.month,
+        shippingDate.day,
+      );
+      DateTime currentDateOnly = DateTime(
+        currentDate.year,
+        currentDate.month,
+        currentDate.day,
+      );
+
+      int daysDifference = shippingDateOnly.difference(currentDateOnly).inDays;
+
+      if (daysDifference <= 0) {
+        return Color(0xFFEF4444).withOpacity(0.2);
+      } else {
+        if (_isNearestUpcomingDate(dateString)) {
+          return Color(0xFFF97316).withOpacity(0.2);
+        } else {
+          return Color(0xFFF1F5F9).withOpacity(0.2);
+        }
+      }
+    } catch (e) {
+      return Colors.transparent;
+    }
+  }
+
+  bool _isNearestUpcomingDate(String dateString) {
+    try {
+      DateTime currentDate = DateTime.now();
+      DateTime currentDateOnly = DateTime(
+        currentDate.year,
+        currentDate.month,
+        currentDate.day,
+      );
+
+      DateTime targetDate = DateTime.parse(dateString);
+      DateTime targetDateOnly = DateTime(
+        targetDate.year,
+        targetDate.month,
+        targetDate.day,
+      );
+
+      if (targetDateOnly.isBefore(currentDateOnly) ||
+          targetDateOnly.isAtSameMomentAs(currentDateOnly)) {
+        return false;
+      }
+
+      DateTime? nearestDate;
+      int minDifference = 999999;
+
+      for (OrderModel order in controller.currentPageItems) {
+        try {
+          DateTime orderDate = DateTime.parse(order.deliveryDate);
+          DateTime orderDateOnly = DateTime(
+            orderDate.year,
+            orderDate.month,
+            orderDate.day,
+          );
+
+          if (orderDateOnly.isAfter(currentDateOnly)) {
+            int difference = orderDateOnly.difference(currentDateOnly).inDays;
+            if (difference < minDifference) {
+              minDifference = difference;
+              nearestDate = orderDateOnly;
+            }
+          }
+        } catch (e) {
+          continue;
+        }
+      }
+
+      return nearestDate != null &&
+          targetDateOnly.isAtSameMomentAs(nearestDate);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  double _getResponsiveFontSize(BuildContext context, double baseSize) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final scaleFactor = screenWidth / 1920;
+    return (baseSize * scaleFactor).clamp(baseSize * 0.8, baseSize * 2.0);
+  }
+
+  double _getResponsivePadding(BuildContext context, double basePadding) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final scaleFactor = screenWidth / 1920;
+    return (basePadding * scaleFactor).clamp(
+      basePadding * 0.8,
+      basePadding * 2.0,
     );
   }
 }
