@@ -356,7 +356,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       child: Container(
         height: MediaQuery.of(context).size.height * 0.05,
         padding: EdgeInsets.symmetric(
-          vertical: _getResponsivePadding(context, 04),
+          vertical: _getResponsivePadding(context, 02),
           horizontal: _getResponsivePadding(context, 2),
         ),
         margin: EdgeInsets.symmetric(vertical: 1),
