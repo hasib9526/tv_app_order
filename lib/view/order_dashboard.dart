@@ -383,7 +383,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               context,
               order.balanceQty.toString(),
               0.8,
-              balanceColor.withOpacity(0.6),
+              balanceColor.withOpacity(0.3),
               textColor: Colors.white,
               hasBorder: true,
               borderColor: balanceColor,
