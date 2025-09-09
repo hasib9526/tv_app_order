@@ -111,7 +111,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           () => Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(
-          vertical: _getResponsivePadding(context, 4),
+          vertical: _getResponsivePadding(context, 2),
           horizontal: _getResponsivePadding(context, 30),
         ),
         decoration: BoxDecoration(
@@ -277,7 +277,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       flex: (flex * 10).toInt(),
       child: Container(
         padding: EdgeInsets.symmetric(
-          vertical: _getResponsivePadding(context, 6),
+          vertical: _getResponsivePadding(context, 4),
           horizontal: _getResponsivePadding(context, 6),
         ),
         child: Text(
@@ -290,7 +290,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
             letterSpacing: 0.5,
             shadows: [
               Shadow(
-                color: Colors.white.withOpacity(0.8), // Light shadow
+                color: Colors.white.withOpacity(0.3), // Light shadow
                 blurRadius: 2,
                 offset: Offset(1, 1),
               ),
