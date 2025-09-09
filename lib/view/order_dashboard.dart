@@ -257,7 +257,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           _buildHeaderCell(context, 'Style', 2.2),
           _buildHeaderCell(context, 'PO', 1.5),
           _buildHeaderCell(context, 'Color', 2),
-          _buildHeaderCell(context, 'Shipping Date', 0.9),
+          _buildHeaderCell(context, 'Inspection Offer Date', 0.9),
           _buildHeaderCell(context, 'Destination', 1.1),
           _buildHeaderCell(context, 'OrderQty', 0.9),
           // _buildHeaderCell(context, 'Today Scan Qty', 0.9),
@@ -315,10 +315,10 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
         : Color(0xFF334155).withOpacity(0.6);
 
     final balanceColor = double.parse(order.balanceQty) > 0
-        ? Color(0xFFEF4444)
+        ? Colors.red
         : Color(0xFF10B981);
 
-    final remainColor = double.parse(order.ctnPerQty) > 0
+    final remainColor = double.parse(order.balanceCTNQty) > 0
         ? Color(0xFFF59E0B)
         : Color(0xFF10B981);
 
@@ -346,14 +346,16 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           _buildDataCell(context, order.color, 2, Colors.transparent),
           _buildDataCell(
             context,
-            _formatShippingDate(order.deliveryDate),
+            _formatShippingDate(order.shipmentDate),
             0.9,
-            _getShippingDateBackgroundColor(order.deliveryDate),
-            textColor: _getShippingDateColor(order.deliveryDate),
+            _getShippingDateBackgroundColor(order.shipmentDate),
+            textColor: Colors.white,
             hasBorder:
-                _getShippingDateBackgroundColor(order.deliveryDate) !=
+                _getShippingDateBackgroundColor(order.shipmentDate) !=
                 Colors.transparent,
-            borderColor: _getShippingDateColor(order.deliveryDate),
+            borderColor: _getShippingDateColor(order.shipmentDate),
+              fontWeight: FontWeight.bold,
+              fontSize: 16.sp
           ),
           _buildDataCell(context, order.country, 1.1, Colors.transparent),
           _buildDataCell(
@@ -378,10 +380,12 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
             context,
             order.balanceQty.toString(),
             0.8,
-            balanceColor.withOpacity(0.2),
-            textColor: balanceColor,
+            balanceColor.withOpacity(0.6),
+            textColor: Colors.white,
             hasBorder: true,
             borderColor: balanceColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 16.sp
           ),
           _buildDataCell(
             context,
@@ -405,10 +409,12 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
             context,
             order.balanceCTNQty.toString(),
             1.1,
-            remainColor.withOpacity(0.2),
-            textColor: remainColor,
+            remainColor.withOpacity(0.3),
+            textColor: Colors.white,
             hasBorder: true,
             borderColor: remainColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 16.sp
           ),
         ],
       ),
@@ -416,14 +422,16 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
   }
 
   Widget _buildDataCell(
-    BuildContext context,
-    String text,
-    double flex,
-    Color backgroundColor, {
-    Color textColor = const Color(0xFFF1F5F9),
-    bool hasBorder = false,
-    Color? borderColor,
-  }) {
+      BuildContext context,
+      String text,
+      double flex,
+      Color backgroundColor, {
+        Color textColor = const Color(0xFFF1F5F9),
+        bool hasBorder = false,
+        Color? borderColor,
+        FontWeight fontWeight = FontWeight.w600, // 🔑 default w600, changeable
+        double? fontSize,
+      }) {
     return Expanded(
       flex: (flex * 10).toInt(),
       child: Container(
@@ -444,9 +452,9 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           child: Text(
             text,
             style: TextStyle(
-              fontSize: 15.sp,
+              fontSize: fontSize ?? 15.sp,
               color: textColor,
-              fontWeight: FontWeight.w600,
+              fontWeight: fontWeight, // 🔑 now configurable
               letterSpacing: 0.3,
               shadows: [
                 Shadow(
@@ -689,18 +697,28 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
         currentDate.day,
       );
 
-      int daysDifference = shippingDateOnly.difference(currentDateOnly).inDays;
+      if (shippingDateOnly.isBefore(currentDateOnly)) {
 
-      if (daysDifference <= 0) {
-        return Color(0xFFEF4444);
-      } else {
+        return Color(0xFFEF4444); // Red
+      }
+
+      else if (shippingDateOnly.isAtSameMomentAs(currentDateOnly)) {
+
+        return Color(0xFFEF4444); // Red
+      }
+
+      else {
+
         if (_isNearestUpcomingDate(dateString)) {
+
           return Color(0xFFF97316);
         } else {
+
           return Color(0xFFF1F5F9);
         }
       }
     } catch (e) {
+
       return Color(0xFFF1F5F9);
     }
   }
@@ -723,9 +741,12 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
 
       int daysDifference = shippingDateOnly.difference(currentDateOnly).inDays;
 
+
       if (daysDifference <= 0) {
         return Color(0xFFEF4444).withOpacity(0.2);
-      } else {
+      }
+
+      else {
         if (_isNearestUpcomingDate(dateString)) {
           return Color(0xFFF97316).withOpacity(0.2);
         } else {
@@ -753,23 +774,27 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
         targetDate.day,
       );
 
+      // যদি target date past বা current হয় তাহলে false
       if (targetDateOnly.isBefore(currentDateOnly) ||
           targetDateOnly.isAtSameMomentAs(currentDateOnly)) {
         return false;
       }
 
+      // সব orders থেকে সবচেয়ে কাছের future date খুঁজে বের করা (যে কোন month/year হোক না কেন)
       DateTime? nearestDate;
       int minDifference = 999999;
 
+      // Current page এর সব orders check করা
       for (OrderModel order in controller.currentPageItems) {
         try {
-          DateTime orderDate = DateTime.parse(order.deliveryDate);
+          DateTime orderDate = DateTime.parse(order.shipmentDate);
           DateTime orderDateOnly = DateTime(
             orderDate.year,
             orderDate.month,
             orderDate.day,
           );
 
+          // শুধুমাত্র future dates consider করা (যে কোন month/year এ থাকুক)
           if (orderDateOnly.isAfter(currentDateOnly)) {
             int difference = orderDateOnly.difference(currentDateOnly).inDays;
             if (difference < minDifference) {
@@ -782,12 +807,41 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
         }
       }
 
+      // All orders থেকেও check করা যদি আছে (global nearest date)
+      if (controller.orders.isNotEmpty) {
+        for (OrderModel order in controller.orders) {
+          try {
+            DateTime orderDate = DateTime.parse(order.shipmentDate);
+            DateTime orderDateOnly = DateTime(
+              orderDate.year,
+              orderDate.month,
+              orderDate.day,
+            );
+
+            // শুধুমাত্র future dates consider করা
+            if (orderDateOnly.isAfter(currentDateOnly)) {
+              int difference = orderDateOnly.difference(currentDateOnly).inDays;
+              if (difference < minDifference) {
+                minDifference = difference;
+                nearestDate = orderDateOnly;
+              }
+            }
+          } catch (e) {
+            continue;
+          }
+        }
+      }
+
+      // target date টি nearest upcoming date কিনা check করা
       return nearestDate != null &&
           targetDateOnly.isAtSameMomentAs(nearestDate);
     } catch (e) {
       return false;
     }
   }
+
+
+
 
   double _getResponsiveFontSize(BuildContext context, double baseSize) {
     final screenWidth = MediaQuery.of(context).size.width;
