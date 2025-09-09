@@ -45,14 +45,14 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF0A0E1A),
+      backgroundColor: Color(0xFF263238),
       body: SafeArea(
         child: Container(
           decoration: BoxDecoration(
             gradient: RadialGradient(
               center: Alignment.topCenter,
               radius: 1.5,
-              colors: [Color(0xFF1E3A8A).withOpacity(0.1), Color(0xFF0A0E1A)],
+              colors: [Color(0xFF263238).withOpacity(0.3), Color(0xFF37474F)], // Changed from very dark to medium dark
             ),
           ),
           child: FocusableActionDetector(
@@ -108,7 +108,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
 
   Widget _buildHeader(BuildContext context) {
     return Obx(
-      () => Container(
+          () => Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(
           vertical: _getResponsivePadding(context, 4),
@@ -116,7 +116,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
         ),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF1A237E), Color(0xFF283593)],
+            colors: [Color(0xFF263238).withOpacity(0.3), Color(0xFF37474F)], // Changed from dark purples to bright blues
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -206,7 +206,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               bottom: 0,
             ),
             child: Obx(
-              () => ListView.builder(
+                  () => ListView.builder(
                 // physics: NeverScrollableScrollPhysics(),
                 itemCount: controller.currentPageItems.length,
                 itemBuilder: (context, index) {
@@ -215,7 +215,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
                     controller.currentPageItems[index],
                     index,
                     controller.currentPage.value *
-                            controller.itemsPerPage.value +
+                        controller.itemsPerPage.value +
                         index +
                         1,
                   );
@@ -238,7 +238,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF1F2937), Color(0xFF374151)],
+          colors: [Color(0xFF37474F), Color(0xFF546E7A)], // Brighter grays
         ),
         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
         border: Border.all(color: Color(0xFF06B6D4).withOpacity(0.3), width: 1),
@@ -285,14 +285,14 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 17.sp,
-           // color: Color(0xFF06B6D4),
-             color:Colors.white,
+            // color: Color(0xFF06B6D4),
+            color:Colors.white,
             letterSpacing: 0.5,
             shadows: [
               Shadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 2,
-                offset: Offset(1, 1),
+                color: Colors.black.withOpacity(0.8), // Stronger shadow
+                blurRadius: 6,
+                offset: Offset(2, 2),
               ),
             ],
           ),
@@ -305,14 +305,14 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
   }
 
   Widget _buildOrderRow(
-    BuildContext context,
-    OrderModel order,
-    int index,
-    int serialNumber,
-  ) {
+      BuildContext context,
+      OrderModel order,
+      int index,
+      int serialNumber,
+      ) {
     final rowColor = index % 2 == 0
-        ? Color(0xFF1E293B).withOpacity(0.8)
-        : Color(0xFF334155).withOpacity(0.6);
+        ? Color(0xFF37474F).withOpacity(0.9) // Brighter gray
+        : Color(0xFF455A64).withOpacity(0.9);
 
     final balanceColor = double.parse(order.balanceQty) > 0
         ? Colors.red
@@ -333,36 +333,39 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
         ),
       ),
       child: Row(
+
         children: [
           _buildDataCell(
-            context,
-            serialNumber.toString(),
-            0.4,
-            Colors.transparent,
+              context,
+              serialNumber.toString(),
+              0.4,
+              Colors.transparent,
+              fontSize: 16.sp
           ),
-          _buildDataCell(context, order.buyer, 1.3, Colors.transparent),
-          _buildDataCell(context, order.style, 2.2, Colors.transparent),
-          _buildDataCell(context, order.poNo, 1.5, Colors.transparent),
-          _buildDataCell(context, order.color, 2, Colors.transparent),
+          _buildDataCell(context, order.buyer, 1.3, Colors.transparent,fontSize: 16.sp),
+          _buildDataCell(context, order.style, 2.2, Colors.transparent,fontSize: 16.sp),
+          _buildDataCell(context, order.poNo, 1.5, Colors.transparent,fontSize: 16.sp),
+          _buildDataCell(context, order.color, 2, Colors.transparent,fontSize: 16.sp),
           _buildDataCell(
-            context,
-            _formatShippingDate(order.shipmentDate),
-            0.9,
-            _getShippingDateBackgroundColor(order.shipmentDate),
-            textColor: Colors.white,
-            hasBorder:
-                _getShippingDateBackgroundColor(order.shipmentDate) !=
-                Colors.transparent,
-            borderColor: _getShippingDateColor(order.shipmentDate),
+              context,
+              _formatShippingDate(order.shipmentDate),
+              0.9,
+              _getShippingDateBackgroundColor(order.shipmentDate),
+              textColor: Colors.white,
+              hasBorder:
+              _getShippingDateBackgroundColor(order.shipmentDate) !=
+                  Colors.transparent,
+              borderColor: _getShippingDateColor(order.shipmentDate),
               fontWeight: FontWeight.bold,
               fontSize: 16.sp
           ),
-          _buildDataCell(context, order.country, 1.1, Colors.transparent),
+          _buildDataCell(context, order.country, 1.1, Colors.transparent,fontSize: 16.sp),
           _buildDataCell(
-            context,
-            order.orderQty.toString(),
-            0.9,
-            Colors.transparent,
+              context,
+              order.orderQty.toString(),
+              0.9,
+              Colors.transparent,
+              fontSize: 16.sp
           ),
           // _buildDataCell(
           //   context,
@@ -377,42 +380,45 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           //   Colors.transparent,
           // ),
           _buildDataCell(
-            context,
-            order.balanceQty.toString(),
-            0.8,
-            balanceColor.withOpacity(0.6),
-            textColor: Colors.white,
-            hasBorder: true,
-            borderColor: balanceColor,
-            fontWeight: FontWeight.bold,
-            fontSize: 16.sp
+              context,
+              order.balanceQty.toString(),
+              0.8,
+              balanceColor.withOpacity(0.6),
+              textColor: Colors.white,
+              hasBorder: true,
+              borderColor: balanceColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 16.sp
           ),
           _buildDataCell(
-            context,
-            order.ctnQty.toString(),
-            0.9,
-            Colors.transparent,
+              context,
+              order.ctnQty.toString(),
+              0.9,
+              Colors.transparent,
+              fontSize: 16.sp
           ),
           _buildDataCell(
-            context,
-            order.todayCTNFinish.toString(),
-            0.9,
-            Colors.transparent,
+              context,
+              order.todayCTNFinish.toString(),
+              0.9,
+              Colors.transparent,
+              fontSize: 16.sp
           ),
           _buildDataCell(
-            context,
-            order.totalCTNFinish.toString(),
-            0.9,
-            Colors.transparent,
+              context,
+              order.totalCTNFinish.toString(),
+              0.9,
+              Colors.transparent,
+              fontSize: 16.sp
           ),
           _buildDataCell(
-            context,
-            order.balanceCTNQty.toString(),
-            1.1,
-            remainColor.withOpacity(0.3),
-            textColor: Colors.white,
-            hasBorder: true,
-            borderColor: remainColor,
+              context,
+              order.balanceCTNQty.toString(),
+              1.1,
+              remainColor.withOpacity(0.3),
+              textColor: Colors.white,
+              hasBorder: true,
+              borderColor: remainColor,
               fontWeight: FontWeight.bold,
               fontSize: 16.sp
           ),
@@ -426,7 +432,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       String text,
       double flex,
       Color backgroundColor, {
-        Color textColor = const Color(0xFFF1F5F9),
+        Color textColor = Colors.white,
         bool hasBorder = false,
         Color? borderColor,
         FontWeight fontWeight = FontWeight.w600, // 🔑 default w600, changeable
@@ -458,9 +464,9 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               letterSpacing: 0.3,
               shadows: [
                 Shadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 1,
-                  offset: Offset(0.5, 0.5),
+                  color: Colors.black.withOpacity(0.8), // Stronger shadow
+                  blurRadius: 3,
+                  offset: Offset(1, 1),
                 ),
               ],
             ),
@@ -475,16 +481,16 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
 
   Widget _buildFooter(BuildContext context) {
     return Obx(
-      () => Container(
+          () => Container(
         padding: EdgeInsets.symmetric(
           vertical: _getResponsivePadding(context, 3),
         ),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF0A0E1A),
-              Color(0xFF1E293B).withOpacity(0.5),
-              Color(0xFF0A0E1A),
+              Color(0xFF37474F),
+              Color(0xFF546E7A).withOpacity(0.8),
+              Color(0xFF37474F),
             ],
           ),
         ),
@@ -504,8 +510,8 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
                     shape: BoxShape.circle,
                     gradient: i == controller.currentPage.value
                         ? LinearGradient(
-                            colors: [Color(0xFF06B6D4), Color(0xFF8B5CF6)],
-                          )
+                      colors: [Color(0xFF06B6D4), Color(0xFF8B5CF6)],
+                    )
                         : null,
                     color: i != controller.currentPage.value
                         ? Color(0xFF374151)
@@ -516,12 +522,12 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
                     ),
                     boxShadow: i == controller.currentPage.value
                         ? [
-                            BoxShadow(
-                              color: Color(0xFF06B6D4).withOpacity(0.4),
-                              blurRadius: 12,
-                              spreadRadius: 2,
-                            ),
-                          ]
+                      BoxShadow(
+                        color: Color(0xFF06B6D4).withOpacity(0.4),
+                        blurRadius: 12,
+                        spreadRadius: 2,
+                      ),
+                    ]
                         : null,
                   ),
                 ),
@@ -609,7 +615,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           ),
           SizedBox(height: _getResponsivePadding(context, 16)),
           Obx(
-            () => Container(
+                () => Container(
               padding: EdgeInsets.symmetric(
                 horizontal: _getResponsivePadding(context, 48),
                 vertical: _getResponsivePadding(context, 16),
@@ -634,19 +640,19 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           ElevatedButton(
             onPressed: () => controller.fetchOrders(),
             style:
-                ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: _getResponsivePadding(context, 48),
-                    vertical: _getResponsivePadding(context, 20),
-                  ),
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ).copyWith(
-                  backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                ),
+            ElevatedButton.styleFrom(
+              padding: EdgeInsets.symmetric(
+                horizontal: _getResponsivePadding(context, 48),
+                vertical: _getResponsivePadding(context, 20),
+              ),
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
+              ),
+            ).copyWith(
+              backgroundColor: WidgetStateProperty.all(Colors.transparent),
+            ),
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -697,24 +703,38 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
         currentDate.day,
       );
 
+      // if (shippingDateOnly.isBefore(currentDateOnly)) {
+      //
+      //   return Color(0xFFEF4444); // Red
+      // }
+      //
+      // else if (shippingDateOnly.isAtSameMomentAs(currentDateOnly)) {
+      //
+      //   return Color(0xFFEF4444); // Red
+      // }
+      //
+      // else {
+      //
+      //   if (_isNearestUpcomingDate(dateString)) {
+      //
+      //     return Color(0xFFF97316);
+      //   } else {
+      //
+      //     return Color(0xFFF1F5F9);
+      //   }
+      // }
+
       if (shippingDateOnly.isBefore(currentDateOnly)) {
-
-        return Color(0xFFEF4444); // Red
+        return Color(0xFFE53E3E); // Brighter red
       }
-
       else if (shippingDateOnly.isAtSameMomentAs(currentDateOnly)) {
-
-        return Color(0xFFEF4444); // Red
+        return Color(0xFFE53E3E); // Brighter red
       }
-
       else {
-
         if (_isNearestUpcomingDate(dateString)) {
-
-          return Color(0xFFF97316);
+          return Color(0xFFED8936); // Brighter orange
         } else {
-
-          return Color(0xFFF1F5F9);
+          return Colors.white; // Pure white
         }
       }
     } catch (e) {
