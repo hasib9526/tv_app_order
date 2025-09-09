@@ -488,9 +488,9 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF37474F),
+              Colors.white,
               Color(0xFF546E7A).withOpacity(0.1),
-              Color(0xFF37474F),
+              Colors.white,
             ],
           ),
         ),
