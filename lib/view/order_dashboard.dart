@@ -45,14 +45,14 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF263238),
+      backgroundColor: Color(0xFFF5F5F5),
       body: SafeArea(
         child: Container(
           decoration: BoxDecoration(
             gradient: RadialGradient(
               center: Alignment.topCenter,
               radius: 1.5,
-              colors: [Color(0xFF263238).withOpacity(0.3), Color(0xFF37474F)], // Changed from very dark to medium dark
+              colors: [Color(0xFFECEFF1).withOpacity(0.8), Color(0xFFCFD8DC)], // Light colors
             ),
           ),
           child: FocusableActionDetector(
@@ -116,7 +116,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
         ),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF263238).withOpacity(0.3), Color(0xFF37474F)], // Changed from dark purples to bright blues
+            colors: [Color(0xFFECEFF1).withOpacity(0.8), Color(0xFFCFD8DC)], // Light colors // Changed from dark purples to bright blues
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -144,10 +144,10 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               style: TextStyle(
                 fontSize: _getResponsiveFontSize(context, 20),
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Colors.black,
                 shadows: [
                   Shadow(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withOpacity(0.1),
                     blurRadius: 4,
                     offset: Offset(1, 1),
                   ),
@@ -159,7 +159,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               style: TextStyle(
                 fontSize: _getResponsiveFontSize(context, 18),
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Colors.black,
                 letterSpacing: 1.2,
               ),
             ),
@@ -168,10 +168,10 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               style: TextStyle(
                 fontSize: _getResponsiveFontSize(context, 18),
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Colors.black,
                 shadows: [
                   Shadow(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withOpacity(0.1),
                     blurRadius: 4,
                     offset: Offset(1, 1),
                   ),
@@ -183,7 +183,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               style: TextStyle(
                 fontSize: _getResponsiveFontSize(context, 18),
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Colors.black,
                 letterSpacing: 1.2,
               ),
             ),
@@ -238,7 +238,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF37474F), Color(0xFF546E7A)], // Brighter grays
+          colors: [Color(0xFFB0BEC5), Color(0xFF90A4AE)], // Light blue-gray
         ),
         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
         border: Border.all(color: Color(0xFF06B6D4).withOpacity(0.3), width: 1),
@@ -286,13 +286,13 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
             fontWeight: FontWeight.bold,
             fontSize: 17.sp,
             // color: Color(0xFF06B6D4),
-            color:Colors.white,
+            color: Colors.black,
             letterSpacing: 0.5,
             shadows: [
               Shadow(
-                color: Colors.black.withOpacity(0.8), // Stronger shadow
-                blurRadius: 6,
-                offset: Offset(2, 2),
+                color: Colors.white.withOpacity(0.8), // Light shadow
+                blurRadius: 2,
+                offset: Offset(1, 1),
               ),
             ],
           ),
@@ -311,8 +311,8 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       int serialNumber,
       ) {
     final rowColor = index % 2 == 0
-        ? Color(0xFF37474F).withOpacity(0.9) // Brighter gray
-        : Color(0xFF455A64).withOpacity(0.9);
+        ? Color(0xFFCFD8DC).withOpacity(0.9) // Light blue-gray
+        : Color(0xFFECEFF1).withOpacity(0.9);
 
     final balanceColor = double.parse(order.balanceQty) > 0
         ? Colors.red
@@ -351,7 +351,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               _formatShippingDate(order.shipmentDate),
               0.9,
               _getShippingDateBackgroundColor(order.shipmentDate),
-              textColor: Colors.white,
+              textColor: Colors.black,
               hasBorder:
               _getShippingDateBackgroundColor(order.shipmentDate) !=
                   Colors.transparent,
@@ -383,8 +383,8 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               context,
               order.balanceQty.toString(),
               0.8,
-              balanceColor.withOpacity(0.6),
-              textColor: Colors.white,
+              balanceColor.withOpacity(0.5),
+              textColor: Colors.black,
               hasBorder: true,
               borderColor: balanceColor,
               fontWeight: FontWeight.bold,
@@ -415,8 +415,8 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               context,
               order.balanceCTNQty.toString(),
               1.1,
-              remainColor.withOpacity(0.3),
-              textColor: Colors.white,
+              remainColor.withOpacity(0.4),
+              textColor: Colors.black,
               hasBorder: true,
               borderColor: remainColor,
               fontWeight: FontWeight.bold,
@@ -432,7 +432,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       String text,
       double flex,
       Color backgroundColor, {
-        Color textColor = Colors.white,
+        Color textColor = Colors.black,
         bool hasBorder = false,
         Color? borderColor,
         FontWeight fontWeight = FontWeight.w600, // 🔑 default w600, changeable
@@ -464,9 +464,9 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               letterSpacing: 0.3,
               shadows: [
                 Shadow(
-                  color: Colors.black.withOpacity(0.8), // Stronger shadow
-                  blurRadius: 3,
-                  offset: Offset(1, 1),
+                  color: Colors.white.withOpacity(0.8), // Light shadow for black text
+                  blurRadius: 1,
+                  offset: Offset(0.5, 0.5),
                 ),
               ],
             ),
@@ -489,7 +489,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           gradient: LinearGradient(
             colors: [
               Color(0xFF37474F),
-              Color(0xFF546E7A).withOpacity(0.8),
+              Color(0xFF546E7A).withOpacity(0.1),
               Color(0xFF37474F),
             ],
           ),
@@ -510,7 +510,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
                     shape: BoxShape.circle,
                     gradient: i == controller.currentPage.value
                         ? LinearGradient(
-                      colors: [Color(0xFF06B6D4), Color(0xFF8B5CF6)],
+                      colors: [Colors.white,Colors.white],
                     )
                         : null,
                     color: i != controller.currentPage.value
@@ -732,9 +732,9 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       }
       else {
         if (_isNearestUpcomingDate(dateString)) {
-          return Color(0xFFED8936); // Brighter orange
+          return Color(0xFFED8936); // Bright orange
         } else {
-          return Colors.white; // Pure white
+          return Colors.black; // Black text
         }
       }
     } catch (e) {
@@ -763,12 +763,12 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
 
 
       if (daysDifference <= 0) {
-        return Color(0xFFEF4444).withOpacity(0.2);
+        return Color(0xFFEF4444).withOpacity(0.6);
       }
 
       else {
         if (_isNearestUpcomingDate(dateString)) {
-          return Color(0xFFF97316).withOpacity(0.2);
+          return Color(0xFFF97316).withOpacity(0.4);
         } else {
           return Color(0xFFF1F5F9).withOpacity(0.2);
         }
