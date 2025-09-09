@@ -319,7 +319,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
         : Color(0xFF10B981);
 
     final remainColor = double.parse(order.balanceCTNQty) > 0
-        ? Color(0xFFF59E0B)
+        ? Colors.red
         : Color(0xFF10B981);
 
     return Container(
@@ -362,7 +362,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           _buildDataCell(context, order.country, 1.1, Colors.transparent,fontSize: 16.sp),
           _buildDataCell(
               context,
-              order.orderQty.toString(),
+              double.parse(order.orderQty).toInt().toString(),
               0.9,
               Colors.transparent,
               fontSize: 16.sp
@@ -388,11 +388,11 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               hasBorder: true,
               borderColor: balanceColor,
               fontWeight: FontWeight.bold,
-              fontSize: 16.sp
+              fontSize: 19.sp
           ),
           _buildDataCell(
               context,
-              order.ctnQty.toString(),
+              double.parse(order.ctnQty).toInt().toString(),
               0.9,
               Colors.transparent,
               fontSize: 16.sp
@@ -415,12 +415,12 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               context,
               order.balanceCTNQty.toString(),
               1.1,
-              remainColor.withOpacity(0.4),
+              remainColor.withOpacity(0.5),
               textColor: Colors.black,
               hasBorder: true,
               borderColor: remainColor,
               fontWeight: FontWeight.bold,
-              fontSize: 16.sp
+              fontSize: 19.sp
           ),
         ],
       ),
