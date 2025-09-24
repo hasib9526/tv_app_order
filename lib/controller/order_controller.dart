@@ -96,7 +96,7 @@ class OrderController extends GetxController {
   void _setupPageTimer() {
     try {
       _pageTimer?.cancel();
-      _pageTimer = Timer.periodic(Duration(seconds: 15), (timer) {
+      _pageTimer = Timer.periodic(Duration(seconds: 25), (timer) {
         try {
           if (!isLoading.value && errorMessage.value.isEmpty && orders.isNotEmpty) {
             currentPage.value = (currentPage.value + 1) % totalPages;

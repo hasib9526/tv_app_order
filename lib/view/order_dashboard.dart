@@ -140,7 +140,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              'UNIT: ${widget.unit.unitName}',
+              widget.unit.unitName,
               style: TextStyle(
                 fontSize: _getResponsiveFontSize(context, 20),
                 fontWeight: FontWeight.bold,
@@ -304,6 +304,8 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
     );
   }
 
+// Replace the existing _buildOrderRow method's balance color logic with this:
+
   Widget _buildOrderRow(
       BuildContext context,
       OrderModel order,
@@ -314,13 +316,14 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
         ? Color(0xFFCFD8DC).withOpacity(0.9) // Light blue-gray
         : Color(0xFFECEFF1).withOpacity(0.9);
 
-    final balanceColor = double.parse(order.balanceQty) > 0
-        ? Colors.red
-        : Color(0xFF10B981);
+    // Use shipping date logic for both Balance Qty and Remain CTN colors
+    // Use shipping date logic for both Balance Qty and Remain CTN colors
+    final balanceColor = _getShippingDateColor(order.shipmentDate);
+    final remainColor = _getShippingDateColor(order.shipmentDate);
 
-    final remainColor = double.parse(order.balanceCTNQty) > 0
-        ? Colors.red
-        : Color(0xFF10B981);
+    // Use shipping date background color logic
+    final balanceBackgroundColor = _getShippingDateBackgroundColor(order.shipmentDate);
+    final remainBackgroundColor = _getShippingDateBackgroundColor(order.shipmentDate);
 
     return Container(
       decoration: BoxDecoration(
@@ -333,7 +336,6 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
         ),
       ),
       child: Row(
-
         children: [
           _buildDataCell(
               context,
@@ -367,23 +369,12 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               Colors.transparent,
               fontSize: 16.sp
           ),
-          // _buildDataCell(
-          //   context,
-          //   order.todayPeaceFinish.toString(),
-          //   0.9,
-          //   Colors.transparent,
-          // ),
-          // _buildDataCell(
-          //   context,
-          //   order.todayPeaceShip.toString(),
-          //   0.9,
-          //   Colors.transparent,
-          // ),
+          // Updated Balance Qty cell with shipping date colors
           _buildDataCell(
               context,
               order.balanceQty.toString(),
               0.8,
-              balanceColor.withOpacity(0.5),
+              balanceBackgroundColor,
               textColor: Colors.black,
               hasBorder: true,
               borderColor: balanceColor,
@@ -411,11 +402,12 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               Colors.transparent,
               fontSize: 16.sp
           ),
+          // Updated Remain CTN cell with shipping date colors
           _buildDataCell(
               context,
               order.balanceCTNQty.toString(),
               1.1,
-              remainColor.withOpacity(0.5),
+              remainBackgroundColor,
               textColor: Colors.black,
               hasBorder: true,
               borderColor: remainColor,
@@ -426,7 +418,6 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       ),
     );
   }
-
   Widget _buildDataCell(
       BuildContext context,
       String text,
