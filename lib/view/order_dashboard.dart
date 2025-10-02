@@ -4,9 +4,19 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:tv_app_order/models/unit_model.dart';
+import 'package:tv_app_order/view/packing_production_dashboard/packing_production_details_dashboard.dart';
 import 'package:tv_app_order/view/unit_selection_screen.dart';
 import '../controller/order_controller.dart';
 import '../models/order_model.dart';
+
+// Create custom intents for different actions
+class GoBackIntent extends Intent {
+  const GoBackIntent();
+}
+
+class ToggleDashboardIntent extends Intent {
+  const ToggleDashboardIntent();
+}
 
 class OrdersDashboard extends StatefulWidget {
   final Unit unit;
@@ -52,24 +62,31 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
             gradient: RadialGradient(
               center: Alignment.topCenter,
               radius: 1.5,
-              colors: [Color(0xFFECEFF1).withOpacity(0.8), Color(0xFFCFD8DC)], // Light colors
+              colors: [Color(0xFFECEFF1).withOpacity(0.8), Color(0xFFCFD8DC)],
             ),
           ),
           child: FocusableActionDetector(
             focusNode: _focusNode,
             autofocus: true,
             shortcuts: {
-              LogicalKeySet(LogicalKeyboardKey.goBack): const ActivateIntent(),
+              LogicalKeySet(LogicalKeyboardKey.goBack): const GoBackIntent(),
+              LogicalKeySet(LogicalKeyboardKey.space): const ToggleDashboardIntent(),
             },
             actions: {
-              ActivateIntent: CallbackAction(
-                onInvoke: (_) {
+              GoBackIntent: CallbackAction<GoBackIntent>(
+                onInvoke: (intent) {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) => UnitSelectionScreen(),
                     ),
                   );
+                  return null;
+                },
+              ),
+              ToggleDashboardIntent: CallbackAction<ToggleDashboardIntent>(
+                onInvoke: (intent) {
+                  controller.toggleDashboard();
                   return null;
                 },
               ),
@@ -82,23 +99,14 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
                   controller.previousPage();
                 }
               },
-              child: Column(
-                children: [
-                  _buildHeader(context),
-                  Expanded(
-                    child: Obx(() {
-                      if (controller.isLoading.value) {
-                        return _buildLoadingWidget(context);
-                      }
-                      if (controller.errorMessage.value.isNotEmpty) {
-                        return _buildErrorWidget(context);
-                      }
-                      return _buildPagedContent(context);
-                    }),
-                  ),
-                  _buildFooter(context),
-                ],
-              ),
+              child: Obx(() {
+                // Check if we should show packing dashboard
+                if (controller.showPackingDashboard.value) {
+                  return _buildPackingDashboardWithHeader(context);
+                } else {
+                  return _buildMainContent(context);
+                }
+              }),
             ),
           ),
         ),
@@ -155,11 +163,11 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
               ),
             ),
             Text(
-              'CT PAT ',
+              controller.showPackingDashboard.value ? 'Packing Production Details Dashboard' : 'CT PAT',
               style: TextStyle(
                 fontSize: _getResponsiveFontSize(context, 18),
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: controller.showPackingDashboard.value ? Colors.black : Colors.black,
                 letterSpacing: 1.2,
               ),
             ),
@@ -227,6 +235,39 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       ],
     );
   }
+
+  Widget _buildPackingDashboardWithHeader(BuildContext context) {
+    return Column(
+      children: [
+        _buildHeader(context),
+        Expanded(
+          child: PackingProductionDashboard(),
+        ),
+        // _buildPackingFooter(context),
+      ],
+    );
+  }
+
+  Widget _buildMainContent(BuildContext context) {
+    return Column(
+      children: [
+        _buildHeader(context),
+        Expanded(
+          child: Obx(() {
+            if (controller.isLoading.value) {
+              return _buildLoadingWidget(context);
+            }
+            if (controller.errorMessage.value.isNotEmpty) {
+              return _buildErrorWidget(context);
+            }
+            return _buildPagedContent(context);
+          }),
+        ),
+        _buildFooter(context),
+      ],
+    );
+  }
+
 
   Widget _buildTableHeader(BuildContext context) {
     return Container(
@@ -694,27 +735,6 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
         currentDate.day,
       );
 
-      // if (shippingDateOnly.isBefore(currentDateOnly)) {
-      //
-      //   return Color(0xFFEF4444); // Red
-      // }
-      //
-      // else if (shippingDateOnly.isAtSameMomentAs(currentDateOnly)) {
-      //
-      //   return Color(0xFFEF4444); // Red
-      // }
-      //
-      // else {
-      //
-      //   if (_isNearestUpcomingDate(dateString)) {
-      //
-      //     return Color(0xFFF97316);
-      //   } else {
-      //
-      //     return Color(0xFFF1F5F9);
-      //   }
-      // }
-
       if (shippingDateOnly.isBefore(currentDateOnly)) {
         return Color(0xFFE53E3E); // Brighter red
       }
@@ -850,9 +870,6 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       return false;
     }
   }
-
-
-
 
   double _getResponsiveFontSize(BuildContext context, double baseSize) {
     final screenWidth = MediaQuery.of(context).size.width;
