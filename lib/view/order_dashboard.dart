@@ -241,7 +241,7 @@ class _OrdersDashboardState extends State<OrdersDashboard> {
       children: [
         _buildHeader(context),
         Expanded(
-          child: PackingProductionDashboard(),
+          child: PackingProductionDashboard(unit: widget.unit),
         ),
         // _buildPackingFooter(context),
       ],

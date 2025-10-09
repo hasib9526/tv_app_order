@@ -1,0 +1,186 @@
+https://apps.bitopibd.com/Bimobapiv2/api/finishGood/GetHourWiseScan?companyId=06&Unit=UNIT-01 
+[
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "HourOnly": 8,
+        "TodayScanFinish": 133.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "HourOnly": 9,
+        "TodayScanFinish": 475.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "HourOnly": 10,
+        "TodayScanFinish": 505.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "HourOnly": 11,
+        "TodayScanFinish": 729.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "HourOnly": 12,
+        "TodayScanFinish": 588.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "HourOnly": 13,
+        "TodayScanFinish": 51.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "HourOnly": 14,
+        "TodayScanFinish": 630.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "HourOnly": 15,
+        "TodayScanFinish": 881.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "HourOnly": 16,
+        "TodayScanFinish": 778.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "HourOnly": 17,
+        "TodayScanFinish": 110.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "HourOnly": 18,
+        "TodayScanFinish": 663.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "HourOnly": 19,
+        "TodayScanFinish": 1816.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "HourOnly": 20,
+        "TodayScanFinish": 831.0000
+    }
+]
+
+
+https://apps.bitopibd.com/Bimobapiv2/api/finishGood/GetDateWiseScan?companyId=06&Unit=UNIT-01
+[
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "ScanDate": "23 Sep 2025",
+        "TodayScanFinish": 4017.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "ScanDate": "24 Sep 2025",
+        "TodayScanFinish": 7614.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "ScanDate": "25 Sep 2025",
+        "TodayScanFinish": 8187.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "ScanDate": "27 Sep 2025",
+        "TodayScanFinish": 4818.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "ScanDate": "28 Sep 2025",
+        "TodayScanFinish": 8249.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "ScanDate": "29 Sep 2025",
+        "TodayScanFinish": 5946.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "ScanDate": "30 Sep 2025",
+        "TodayScanFinish": 2809.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "ScanDate": "01 Oct 2025",
+        "TodayScanFinish": 4748.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "ScanDate": "02 Oct 2025",
+        "TodayScanFinish": 9586.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "ScanDate": "04 Oct 2025",
+        "TodayScanFinish": 7270.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "ScanDate": "05 Oct 2025",
+        "TodayScanFinish": 6534.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "ScanDate": "06 Oct 2025",
+        "TodayScanFinish": 7357.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "ScanDate": "07 Oct 2025",
+        "TodayScanFinish": 9878.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "ScanDate": "08 Oct 2025",
+        "TodayScanFinish": 8190.0000
+    },
+    {
+        "CompanyId": "06",
+        "Unit": "UNIT-01",
+        "ScanDate": "09 Oct 2025",
+        "TodayScanFinish": 14.0000
+    }
+]
+
+
+
+
+amar ei screen a D:\Flutter\TV_APP\tv_app_order\lib\view\packing_production_dashboard\packing_production_details_dashboard.dart
+
+uporer 2i ta api add koro 
+ami je first a unit select kori eta same thakbe unit select korle amar oderdeashbord er data show korbe then logig wise packing production er data show korbe 
+
+please do not break or change any ui and other functionality 
