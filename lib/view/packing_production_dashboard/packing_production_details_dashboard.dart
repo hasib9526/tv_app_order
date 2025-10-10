@@ -186,7 +186,7 @@ class _PackingProductionDashboardState
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Day-wise ${widget.unit.unitName} Packing Production (${controller.dailyDateRange})',
+                                'Day-wise Packing Production (${controller.dailyDateRange})',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -339,9 +339,11 @@ class LineChartPainter extends CustomPainter {
 
     // Vertical grid lines aligned with points
     for (int i = 0; i < labels.length; i++) {
-      final x = leftPadding +
-          startOffset +
-          (chartWidth - startOffset) * i / (labels.length - 1);
+      final x = labels.length == 1
+          ? leftPadding + (chartWidth / 2)
+          : leftPadding +
+              startOffset +
+              (chartWidth - startOffset) * i / (labels.length - 1);
       canvas.drawLine(
         Offset(x, topPadding),
         Offset(x, size.height - bottomPadding),
@@ -365,9 +367,11 @@ class LineChartPainter extends CustomPainter {
 
     // X-axis labels
     for (int i = 0; i < labels.length; i++) {
-      final x = leftPadding +
-          startOffset +
-          (chartWidth - startOffset) * i / (labels.length - 1);
+      final x = labels.length == 1
+          ? leftPadding + (chartWidth / 2)
+          : leftPadding +
+              startOffset +
+              (chartWidth - startOffset) * i / (labels.length - 1);
 
       textPainter.text = TextSpan(
         text: labels[i],
@@ -383,9 +387,11 @@ class LineChartPainter extends CustomPainter {
     final points = <Offset>[];
 
     for (int i = 0; i < data.length; i++) {
-      final x = leftPadding +
-          startOffset +
-          (chartWidth - startOffset) * i / (data.length - 1);
+      final x = data.length == 1
+          ? leftPadding + (chartWidth / 2)
+          : leftPadding +
+              startOffset +
+              (chartWidth - startOffset) * i / (data.length - 1);
       final y = size.height -
           bottomPadding -
           ((data[i] - minValue) / (maxValue - minValue) * chartHeight);
@@ -398,7 +404,10 @@ class LineChartPainter extends CustomPainter {
       }
     }
 
-    canvas.drawPath(path, paint);
+    // Only draw line if there are multiple points
+    if (data.length > 1) {
+      canvas.drawPath(path, paint);
+    }
 
     // Draw points with value labels inside a container
     for (int i = 0; i < points.length; i++) {
