@@ -26,6 +26,7 @@ class _UnitSelectionScreenState extends State<UnitSelectionScreen> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
     try {
       fetchUnits();
     } catch (e) {

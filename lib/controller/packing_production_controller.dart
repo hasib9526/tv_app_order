@@ -254,7 +254,12 @@ class PackingProductionController extends GetxController {
 
   List<String> get hourlyLabels {
     return hourlyScanData
-        .map((e) => _formatHourLabel(e.hourOnly))
+        // .map((e) => _formatHourLabel(e.hourOnly))
+        // .toList();
+    // .map((e) => _formatHourLabel(e.hourOnly))
+        .asMap()
+        .entries
+        .map((entry) => _formatHourLabel(entry.key + 1))
         .toList();
   }
 
